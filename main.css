@@ -1050,11 +1050,13 @@ body {
     .hero-buttons {
         flex-direction: column;
         width: 100%;
+        align-items: center;
     }
 
     .btn {
         width: 100%;
         max-width: 300px;
+        text-align: center;
     }
 
     .about-stats {
