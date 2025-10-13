@@ -1,6 +1,6 @@
 // Set the launch date (change this to your desired date)
-// Format: Year, Month (0-11), Day, Hour, Minute, Second
-const launchDate = new Date('2025-11-01T00:00:00').getTime();
+// Format: YYYY-MM-DD or use specific date
+const launchDate = new Date('2025-11-15T23:59:59').getTime();
 
 function updateCountdown() {
     const now = new Date().getTime();
@@ -12,32 +12,61 @@ function updateCountdown() {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
     
+    // Make sure we don't show negative numbers
+    const displayDays = Math.max(0, days);
+    const displayHours = Math.max(0, hours);
+    const displayMinutes = Math.max(0, minutes);
+    const displaySeconds = Math.max(0, seconds);
+    
     // Update the countdown display
-    document.getElementById('days').textContent = String(days).padStart(2, '0');
-    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    
+    if (daysEl) daysEl.textContent = String(displayDays).padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = String(displayHours).padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = String(displayMinutes).padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = String(displaySeconds).padStart(2, '0');
     
     // If countdown is finished
     if (distance < 0) {
         clearInterval(countdownInterval);
-        document.querySelector('.countdown').innerHTML = `
-            <div style="font-size: 2rem; font-weight: bold; color: #4ecdc4;">
-                🎉 We're Live! 🎉
-            </div>
-        `;
-        document.querySelector('.coming-soon-text p').textContent = '✨ Welcome to Press Club!';
+        const countdownEl = document.querySelector('.countdown');
+        const comingSoonEl = document.querySelector('.coming-soon-text p');
         
-        // You can redirect to the main site or reveal content here
-        // window.location.href = 'main.html';
+        if (countdownEl) {
+            countdownEl.innerHTML = `
+                <div style="font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #20a39e, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    🎉 We're Live! 🎉
+                </div>
+            `;
+        }
+        
+        if (comingSoonEl) {
+            comingSoonEl.textContent = '✨ Welcome to Wavy Essai Press Club!';
+        }
+        
+        // Redirect to main page after 3 seconds
+        setTimeout(() => {
+            window.location.href = 'main.html';
+        }, 3000);
     }
 }
 
-// Update countdown every second
-const countdownInterval = setInterval(updateCountdown, 1000);
+// Initialize countdown when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCountdown);
+} else {
+    initCountdown();
+}
 
-// Initial call
-updateCountdown();
+function initCountdown() {
+    // Initial call
+    updateCountdown();
+    // Update countdown every second
+    window.countdownInterval = setInterval(updateCountdown, 1000);
+}
 
 // Add particle effect on mouse move
 document.addEventListener('mousemove', (e) => {
