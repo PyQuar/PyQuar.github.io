@@ -3,8 +3,19 @@
 const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
 
-// Word list - Press & Science themed words
-const WORD_LIST = [
+// Word list configuration
+const WORD_LIST_CONFIG = {
+    // Your GitHub username and the Gist ID for the word list
+    // To create: Go to gist.github.com, create a public gist named "wordwave-words.json"
+    // with content: {"words": ["PRESS", "STORY", ...]}
+    GIST_USERNAME: 'PyQuar',
+    GIST_ID: '', // Will be filled after you create the gist
+    CACHE_KEY: 'wordWaveWordListCache',
+    CACHE_DURATION: 1000 * 60 * 60 // 1 hour in milliseconds
+};
+
+// Default word list - Press & Science themed words (fallback if Gist fails)
+let WORD_LIST = [
     'PRESS', 'STORY', 'MEDIA', 'WRITE', 'QUOTE',
     'ATOMS', 'CELLS', 'GENES', 'VIRUS', 'BRAIN',
     'LASER', 'ORBIT', 'PROBE', 'SOLAR', 'LIGHT',
@@ -76,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gameState.guesses = cloudGameState.guesses || [];
         gameState.targetWord = cloudGameState.targetWord || getDailyWord();
         
-        initializeGame();
+        await initializeGame();
         
         // Recreate the board with saved state
         createBoard();
@@ -97,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gameState.gameOver = true;
         gameState.lastPlayedDate = today;
         
-        initializeGame();
+        await initializeGame();
         
         // Load the previous game state from localStorage
         loadGameState();
@@ -132,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('New daily word for', today, ':', todayWord);
         
         // Initialize game
-        initializeGame();
+        await initializeGame();
         
         // Create fresh board
         createBoard();
@@ -148,8 +159,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 100);
 });
 
+// Load word list from GitHub Gist
+async function loadWordListFromGist() {
+    // Check if we have a cached version that's still valid
+    const cached = localStorage.getItem(WORD_LIST_CONFIG.CACHE_KEY);
+    if (cached) {
+        try {
+            const cacheData = JSON.parse(cached);
+            const cacheAge = Date.now() - cacheData.timestamp;
+            
+            if (cacheAge < WORD_LIST_CONFIG.CACHE_DURATION) {
+                console.log('Using cached word list');
+                WORD_LIST = cacheData.words;
+                return true;
+            }
+        } catch (e) {
+            console.log('Invalid cache, fetching fresh word list');
+        }
+    }
+
+    // If no Gist ID configured, use default list
+    if (!WORD_LIST_CONFIG.GIST_ID) {
+        console.log('No Gist ID configured, using default word list');
+        return true;
+    }
+
+    try {
+        console.log('Fetching word list from Gist...');
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch word list');
+        }
+
+        const gistData = await response.json();
+        const fileContent = gistData.files['wordwave-words.json']?.content;
+        
+        if (!fileContent) {
+            throw new Error('Word list file not found in Gist');
+        }
+
+        const wordData = JSON.parse(fileContent);
+        
+        if (!wordData.words || !Array.isArray(wordData.words)) {
+            throw new Error('Invalid word list format');
+        }
+
+        // Update the word list
+        WORD_LIST = wordData.words.map(w => w.toUpperCase());
+        
+        // Cache the word list
+        localStorage.setItem(WORD_LIST_CONFIG.CACHE_KEY, JSON.stringify({
+            words: WORD_LIST,
+            timestamp: Date.now()
+        }));
+
+        console.log(`✅ Loaded ${WORD_LIST.length} words from Gist`);
+        return true;
+
+    } catch (error) {
+        console.error('Error loading word list from Gist:', error);
+        console.log('Using default word list as fallback');
+        return false;
+    }
+}
+
 // Initialize game
-function initializeGame() {
+async function initializeGame() {
+    // Load word list from Gist first
+    await loadWordListFromGist();
+    
+    // Populate the dev tools word dropdown with updated list
+    populateWordDropdown();
+    
     // Get or generate daily word (only if not already set)
     if (!gameState.targetWord) {
         gameState.targetWord = getDailyWord();
@@ -1020,14 +1109,21 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
 // ================== DEVELOPER TOOLS ==================
 
 // Populate word dropdown
-const devWordSelect = document.getElementById('devWord');
-if (devWordSelect) {
-    WORD_LIST.forEach(word => {
-        const option = document.createElement('option');
-        option.value = word;
-        option.textContent = word;
-        devWordSelect.appendChild(option);
-    });
+function populateWordDropdown() {
+    const devWordSelect = document.getElementById('devWord');
+    if (devWordSelect) {
+        // Clear existing options
+        devWordSelect.innerHTML = '<option value="">Select a word...</option>';
+        
+        // Add all words from the list
+        WORD_LIST.forEach(word => {
+            const option = document.createElement('option');
+            option.value = word;
+            option.textContent = word;
+            devWordSelect.appendChild(option);
+        });
+        console.log(`✅ Populated dropdown with ${WORD_LIST.length} words`);
+    }
 }
 
 // Update dev info panel
@@ -1158,6 +1254,121 @@ if (window.authManager) {
 
 // Initial visibility check
 updateDevButtonVisibility();
+
+// Admin function to update word list (call from console when authenticated)
+window.updateWordListGist = async function(newWords) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        console.error('❌ You must be logged in to update the word list');
+        return;
+    }
+    
+    if (!WORD_LIST_CONFIG.GIST_ID) {
+        console.error('❌ No Gist ID configured. Please set WORD_LIST_CONFIG.GIST_ID in game.js');
+        return;
+    }
+    
+    if (!Array.isArray(newWords) || newWords.length === 0) {
+        console.error('❌ Please provide an array of words');
+        console.log('Example: updateWordListGist(["PRESS", "STORY", "MEDIA", ...])');
+        return;
+    }
+    
+    try {
+        const gistData = {
+            description: 'Word Wave - Word List',
+            public: true, // Public so anyone can read it
+            files: {
+                'wordwave-words.json': {
+                    content: JSON.stringify({
+                        words: newWords.map(w => w.toUpperCase()),
+                        lastUpdated: new Date().toISOString(),
+                        version: '1.0'
+                    }, null, 2)
+                }
+            }
+        };
+        
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${window.authManager.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gistData)
+            }
+        );
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        console.log('✅ Word list updated successfully!');
+        console.log(`📝 ${newWords.length} words saved to Gist`);
+        
+        // Clear cache and reload
+        localStorage.removeItem(WORD_LIST_CONFIG.CACHE_KEY);
+        console.log('🔄 Reloading to apply new word list...');
+        setTimeout(() => location.reload(), 1000);
+        
+    } catch (error) {
+        console.error('❌ Error updating word list:', error);
+    }
+};
+
+// Helper to create initial word list Gist
+window.createWordListGist = async function(words = WORD_LIST) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        console.error('❌ You must be logged in to create a Gist');
+        return;
+    }
+    
+    try {
+        const gistData = {
+            description: 'Word Wave - Word List',
+            public: true,
+            files: {
+                'wordwave-words.json': {
+                    content: JSON.stringify({
+                        words: words.map(w => w.toUpperCase()),
+                        lastUpdated: new Date().toISOString(),
+                        version: '1.0'
+                    }, null, 2)
+                }
+            }
+        };
+        
+        const response = await fetch('https://api.github.com/gists', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${window.authManager.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gistData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Word list Gist created successfully!');
+        console.log('📋 Gist ID:', result.id);
+        console.log('🔗 URL:', result.html_url);
+        console.log('\n📝 Next steps:');
+        console.log(`1. Copy this Gist ID: ${result.id}`);
+        console.log('2. Update game.js: WORD_LIST_CONFIG.GIST_ID = "' + result.id + '"');
+        console.log('3. Commit and push the change');
+        
+        return result.id;
+        
+    } catch (error) {
+        console.error('❌ Error creating Gist:', error);
+    }
+};
 
 // ====================================================
 
