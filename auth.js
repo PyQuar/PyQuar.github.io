@@ -9,7 +9,7 @@ const AUTH_CONFIG = {
     REDIRECT_URI: window.location.origin + '/game.html',
     SCOPE: 'gist',
     GIST_FILENAME: 'word-wave-stats.json',
-    PROXY_URL: 'https://word-wave-auth-proxy-dsgufe9lw-pyquars-projects.vercel.app/api/token' // Vercel proxy endpoint
+    PROXY_URL: 'https://word-wave-auth-proxy.vercel.app' // Vercel proxy endpoint
 };
 
 class AuthManager {
