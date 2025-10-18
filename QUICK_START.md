@@ -93,7 +93,7 @@ git add .
 git commit -m "Add GitHub authentication system"
 
 # Push to GitHub
-git push origin master
+git push origin main
 ```
 
 Wait 1-2 minutes for GitHub Pages to deploy.
