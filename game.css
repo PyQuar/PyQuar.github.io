@@ -128,6 +128,17 @@
 }
 
 
+.game-logo-link {
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.game-logo-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
 .game-logo {
     display: flex;
     align-items: center;
