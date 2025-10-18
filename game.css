@@ -595,9 +595,13 @@
 /* Statistics */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 15px;
     margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
 }
 
 .stat-box {
@@ -606,6 +610,7 @@
     background: linear-gradient(135deg, rgba(29, 78, 216, 0.1), rgba(32, 163, 158, 0.1));
     border: 2px solid rgba(45, 212, 191, 0.2);
     border-radius: 15px;
+    min-width: 100px;
 }
 
 .stat-number {
@@ -856,6 +861,8 @@
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        max-width: 320px;
+        gap: 12px;
     }
 
     .key {

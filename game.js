@@ -44,6 +44,8 @@ const resultModal = document.getElementById('resultModal');
 
 // Initialize game
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Game initializing...');
+    
     // Initialize authentication first
     if (window.authManager) {
         await window.authManager.init();
@@ -52,16 +54,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadStats();
     }
     
+    console.log('Stats after loading:', gameState.stats);
+    
+    initializeGame();
+    setupEventListeners();
+    
     // Check if user already played today
     const today = getTodayString();
     const lastPlayed = localStorage.getItem('wordWaveLastPlayed');
+    
+    console.log('Today:', today, 'Last played:', lastPlayed);
     
     if (lastPlayed === today) {
         // User already played today
         gameState.gameOver = true;
         gameState.lastPlayedDate = today;
         
-        // Load the previous game state
+        // Load the previous game state (this will create the board with previous guesses)
         loadGameState();
         
         // Show message
@@ -74,14 +83,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 1000);
             }
         }, 500);
+    } else {
+        // New game - create empty board
+        createBoard();
     }
-    
-    initializeGame();
-    setupEventListeners();
-    createBoard();
     
     // Display stats after loading them
     if (document.getElementById('gamesPlayed')) {
+        console.log('Calling displayStats...');
         displayStats();
     }
 });
@@ -498,21 +507,40 @@ function showResultModal(won) {
 
 // Display statistics
 function displayStats() {
-    document.getElementById('gamesPlayed').textContent = gameState.stats.gamesPlayed || 0;
+    console.log('displayStats called, current stats:', gameState.stats);
+    
+    // Ensure stats object exists
+    if (!gameState.stats) {
+        gameState.stats = {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            currentStreak: 0,
+            maxStreak: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        };
+    }
+    
+    const gamesPlayed = gameState.stats.gamesPlayed || 0;
+    const gamesWon = gameState.stats.gamesWon || 0;
+    const currentStreak = gameState.stats.currentStreak || 0;
+    const maxStreak = gameState.stats.maxStreak || 0;
+    
+    document.getElementById('gamesPlayed').textContent = gamesPlayed;
     document.getElementById('winPercentage').textContent = 
-        gameState.stats.gamesPlayed > 0 
-            ? Math.round((gameState.stats.gamesWon / gameState.stats.gamesPlayed) * 100) 
+        gamesPlayed > 0 
+            ? Math.round((gamesWon / gamesPlayed) * 100) 
             : 0;
-    document.getElementById('currentStreak').textContent = gameState.stats.currentStreak || 0;
-    document.getElementById('maxStreak').textContent = gameState.stats.maxStreak || 0;
+    document.getElementById('currentStreak').textContent = currentStreak;
+    document.getElementById('maxStreak').textContent = maxStreak;
     
     // Display distribution
     const distribution = document.getElementById('distribution');
     distribution.innerHTML = '';
     
-    const maxGuesses = Math.max(...gameState.stats.guessDistribution, 1);
+    const guessDistribution = gameState.stats.guessDistribution || [0, 0, 0, 0, 0, 0];
+    const maxGuesses = Math.max(...guessDistribution, 1);
     
-    gameState.stats.guessDistribution.forEach((count, index) => {
+    guessDistribution.forEach((count, index) => {
         const row = document.createElement('div');
         row.className = 'distribution-row';
         
@@ -599,17 +627,25 @@ function saveStats() {
 
 function loadStats() {
     const saved = localStorage.getItem('wordWaveStats');
+    console.log('loadStats - raw localStorage:', saved);
+    
     if (saved) {
         try {
             const parsedStats = JSON.parse(saved);
+            console.log('loadStats - parsed:', parsedStats);
+            
             // Validate and ensure all properties exist
             gameState.stats = {
-                gamesPlayed: parsedStats.gamesPlayed || 0,
-                gamesWon: parsedStats.gamesWon || 0,
-                currentStreak: parsedStats.currentStreak || 0,
-                maxStreak: parsedStats.maxStreak || 0,
-                guessDistribution: parsedStats.guessDistribution || [0, 0, 0, 0, 0, 0]
+                gamesPlayed: Number(parsedStats.gamesPlayed) || 0,
+                gamesWon: Number(parsedStats.gamesWon) || 0,
+                currentStreak: Number(parsedStats.currentStreak) || 0,
+                maxStreak: Number(parsedStats.maxStreak) || 0,
+                guessDistribution: Array.isArray(parsedStats.guessDistribution) 
+                    ? parsedStats.guessDistribution.map(n => Number(n) || 0)
+                    : [0, 0, 0, 0, 0, 0]
             };
+            
+            console.log('loadStats - final gameState.stats:', gameState.stats);
         } catch (error) {
             console.error('Error loading stats:', error);
             // Reset to default stats if parsing fails
@@ -621,6 +657,8 @@ function loadStats() {
                 guessDistribution: [0, 0, 0, 0, 0, 0]
             };
         }
+    } else {
+        console.log('No saved stats found');
     }
 }
 
