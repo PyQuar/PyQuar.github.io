@@ -150,8 +150,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Initialize game
 function initializeGame() {
-    // Get or generate daily word
-    gameState.targetWord = getDailyWord();
+    // Get or generate daily word (only if not already set)
+    if (!gameState.targetWord) {
+        gameState.targetWord = getDailyWord();
+    }
     console.log('Target word:', gameState.targetWord); // For testing
 }
 
@@ -168,6 +170,12 @@ function getDailyWord() {
 
 // Get today's date as string (YYYY-MM-DD) in local timezone
 function getTodayString() {
+    // Check if dev mode has overridden the date
+    const devDate = localStorage.getItem('wordWaveDevDate');
+    if (devDate) {
+        return devDate;
+    }
+    
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -267,6 +275,17 @@ function setupEventListeners() {
     
     // Settings
     document.getElementById('resetBtn').addEventListener('click', resetStats);
+    
+    // Developer Tools
+    const devBtn = document.getElementById('devBtn');
+    if (devBtn) {
+        devBtn.addEventListener('click', () => openModal('devModal'));
+    }
+    
+    document.getElementById('setDateBtn')?.addEventListener('click', setDevDate);
+    document.getElementById('setWordBtn')?.addEventListener('click', setDevWord);
+    document.getElementById('nextDayBtn')?.addEventListener('click', skipToTomorrow);
+    document.getElementById('resetDayBtn')?.addEventListener('click', resetToToday);
     
     // Auth event listeners
     const loginBtn = document.getElementById('loginBtn');
@@ -986,6 +1005,150 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
         localStorage.setItem('hardMode', false);
     }
 });
+
+// ================== DEVELOPER TOOLS ==================
+
+// Populate word dropdown
+const devWordSelect = document.getElementById('devWord');
+if (devWordSelect) {
+    WORD_LIST.forEach(word => {
+        const option = document.createElement('option');
+        option.value = word;
+        option.textContent = word;
+        devWordSelect.appendChild(option);
+    });
+}
+
+// Update dev info panel
+function updateDevInfo() {
+    const devCurrentDate = document.getElementById('devCurrentDate');
+    const devCurrentWord = document.getElementById('devCurrentWord');
+    const devLastPlayed = document.getElementById('devLastPlayed');
+    
+    if (devCurrentDate) devCurrentDate.textContent = getTodayString();
+    if (devCurrentWord) devCurrentWord.textContent = gameState.targetWord || 'Not set';
+    if (devLastPlayed) devLastPlayed.textContent = gameState.lastPlayedDate || 'Never';
+}
+
+// Open dev modal and update info
+const devModal = document.getElementById('devModal');
+if (devModal) {
+    const originalOpenModal = window.openModal;
+    window.openModal = function(modalId) {
+        originalOpenModal(modalId);
+        if (modalId === 'devModal') {
+            updateDevInfo();
+        }
+    };
+}
+
+// Set custom date
+function setDevDate() {
+    const dateInput = document.getElementById('devDate');
+    if (!dateInput || !dateInput.value) {
+        showMessage('Please select a date');
+        return;
+    }
+    
+    // Store custom date in localStorage
+    localStorage.setItem('wordWaveDevDate', dateInput.value);
+    
+    // Clear game state to trigger new game
+    localStorage.removeItem('wordWaveLastPlayed');
+    localStorage.removeItem('wordWaveGameState');
+    
+    // Reload to apply changes
+    showMessage('Date set! Reloading...');
+    setTimeout(() => location.reload(), 500);
+}
+
+// Set custom word
+function setDevWord() {
+    const wordSelect = document.getElementById('devWord');
+    if (!wordSelect || !wordSelect.value) {
+        showMessage('Please select a word');
+        return;
+    }
+    
+    // Force the selected word
+    gameState.targetWord = wordSelect.value.toUpperCase();
+    gameState.currentRow = 0;
+    gameState.currentGuess = '';
+    gameState.guesses = [];
+    gameState.gameOver = false;
+    gameState.isWin = false;
+    
+    // Save to localStorage
+    localStorage.setItem('wordWaveGameState', JSON.stringify(gameState));
+    
+    // Clear the board
+    document.querySelectorAll('.tile').forEach(tile => {
+        tile.textContent = '';
+        tile.className = 'tile';
+    });
+    
+    closeModal('devModal');
+    showMessage(`Word set to ${wordSelect.value.toUpperCase()}`);
+    updateDevInfo();
+}
+
+// Skip to tomorrow
+function skipToTomorrow() {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const tomorrowString = `${year}-${month}-${day}`;
+    
+    // Store custom date
+    localStorage.setItem('wordWaveDevDate', tomorrowString);
+    
+    // Clear game state
+    localStorage.removeItem('wordWaveLastPlayed');
+    localStorage.removeItem('wordWaveGameState');
+    
+    // Reload
+    showMessage('Skipping to tomorrow...');
+    setTimeout(() => location.reload(), 500);
+}
+
+// Reset to today
+function resetToToday() {
+    // Clear dev date override
+    localStorage.removeItem('wordWaveDevDate');
+    
+    // Clear game state
+    localStorage.removeItem('wordWaveLastPlayed');
+    localStorage.removeItem('wordWaveGameState');
+    
+    // Reload
+    showMessage('Resetting to today...');
+    setTimeout(() => location.reload(), 500);
+}
+
+// Show/hide dev button based on authentication
+function updateDevButtonVisibility() {
+    const devBtn = document.getElementById('devBtn');
+    if (devBtn && window.authManager) {
+        devBtn.style.display = window.authManager.isAuthenticated ? 'flex' : 'none';
+    }
+}
+
+// Update visibility when auth state changes
+if (window.authManager) {
+    const originalUpdateUI = window.authManager.updateUI;
+    window.authManager.updateUI = function() {
+        originalUpdateUI.call(window.authManager);
+        updateDevButtonVisibility();
+    };
+}
+
+// Initial visibility check
+updateDevButtonVisibility();
+
+// ====================================================
 
 console.log('%c🌊 Word Wave Game Loaded!', 'font-size: 20px; font-weight: bold; color: #2dd4bf;');
 console.log('%cToday\'s word:', gameState.targetWord);

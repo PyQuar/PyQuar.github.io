@@ -71,6 +71,9 @@
                     <button class="icon-btn" id="settingsBtn" title="Settings">
                         <i class="fas fa-cog"></i>
                     </button>
+                    <button class="icon-btn" id="devBtn" title="Developer Tools" style="display: none;">
+                        <i class="fas fa-code"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -333,6 +336,55 @@
                 <div class="next-word">
                     <p>Next Word Wave in:</p>
                     <div class="countdown" id="resultCountdown">--:--:--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Tools Modal (Only visible when authenticated) -->
+    <div class="modal" id="devModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-code"></i> Developer Tools</h2>
+                <button class="modal-close" data-modal="devModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="dev-section">
+                    <h3>Time Travel</h3>
+                    <p>Jump to a specific date to test different daily words:</p>
+                    <input type="date" id="devDate" class="dev-input">
+                    <button class="btn btn-primary" id="setDateBtn">
+                        <i class="fas fa-calendar"></i> Set Date
+                    </button>
+                </div>
+
+                <div class="dev-section">
+                    <h3>Force Word</h3>
+                    <p>Select a specific word for testing:</p>
+                    <select id="devWord" class="dev-input">
+                        <option value="">-- Current Daily Word --</option>
+                    </select>
+                    <button class="btn btn-primary" id="setWordBtn">
+                        <i class="fas fa-edit"></i> Set Word
+                    </button>
+                </div>
+
+                <div class="dev-section">
+                    <h3>Quick Actions</h3>
+                    <button class="btn btn-secondary" id="nextDayBtn">
+                        <i class="fas fa-forward"></i> Skip to Tomorrow
+                    </button>
+                    <button class="btn btn-secondary" id="resetDayBtn">
+                        <i class="fas fa-undo"></i> Reset to Today
+                    </button>
+                </div>
+
+                <div class="dev-info">
+                    <p><strong>Current Date:</strong> <span id="devCurrentDate">--</span></p>
+                    <p><strong>Current Word:</strong> <span id="devCurrentWord">--</span></p>
+                    <p><strong>Last Played:</strong> <span id="devLastPlayed">--</span></p>
                 </div>
             </div>
         </div>

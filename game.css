@@ -914,3 +914,79 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Developer Tools */
+.dev-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(29, 78, 216, 0.05);
+    border: 2px solid rgba(45, 212, 191, 0.2);
+    border-radius: 15px;
+}
+
+.dev-section h3 {
+    color: #2dd4bf;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.dev-section p {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.dev-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(45, 212, 191, 0.3);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.dev-input:focus {
+    outline: none;
+    border-color: #2dd4bf;
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+}
+
+.dev-input option {
+    background: #0f172a;
+    color: white;
+}
+
+.dev-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(29, 78, 216, 0.1);
+    border-radius: 10px;
+}
+
+.dev-info p {
+    color: #e0e0e0;
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+.dev-info strong {
+    color: #2dd4bf;
+}
+
+.dev-info span {
+    color: white;
+    font-weight: 600;
+}
+
+#devBtn {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(168, 85, 247, 0.15));
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+#devBtn:hover {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.25), rgba(168, 85, 247, 0.25));
+    border-color: rgba(147, 51, 234, 0.5);
+}
