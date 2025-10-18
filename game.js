@@ -23,6 +23,7 @@ let gameState = {
     gameOver: false,
     isWin: false,
     guesses: [],
+    lastPlayedDate: null,
     stats: {
         gamesPlayed: 0,
         gamesWon: 0,
@@ -51,6 +52,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadStats();
     }
     
+    // Check if user already played today
+    const today = getTodayString();
+    const lastPlayed = localStorage.getItem('wordWaveLastPlayed');
+    
+    if (lastPlayed === today) {
+        // User already played today
+        gameState.gameOver = true;
+        gameState.lastPlayedDate = today;
+        
+        // Load the previous game state
+        loadGameState();
+        
+        // Show message
+        setTimeout(() => {
+            showMessage('You already played today! Come back tomorrow.', false);
+            // Show result modal with countdown
+            if (gameState.isWin !== undefined) {
+                setTimeout(() => {
+                    showResultModal(gameState.isWin);
+                }, 1000);
+            }
+        }, 500);
+    }
+    
     initializeGame();
     setupEventListeners();
     createBoard();
@@ -77,6 +102,12 @@ function getDailyWord() {
     const dayOfYear = Math.floor(diff / oneDay);
     const index = dayOfYear % WORD_LIST.length;
     return WORD_LIST[index];
+}
+
+// Get today's date as string (YYYY-MM-DD)
+function getTodayString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
 }
 
 // Create game board
@@ -334,7 +365,7 @@ function gameWon() {
         }
     }, 1500);
     
-    // Update stats
+    // Update stats (this also saves game state)
     updateStats(true);
     
     // Show result modal
@@ -348,7 +379,7 @@ function gameLost() {
     gameState.gameOver = true;
     gameState.isWin = false;
     
-    // Update stats
+    // Update stats (this also saves game state)
     updateStats(false);
     
     // Show result modal
@@ -369,6 +400,14 @@ function updateStats(won) {
     } else {
         gameState.stats.currentStreak = 0;
     }
+    
+    // Mark today as played
+    const today = getTodayString();
+    localStorage.setItem('wordWaveLastPlayed', today);
+    gameState.lastPlayedDate = today;
+    
+    // Save game state for reload
+    saveGameState();
     
     saveStats();
     
@@ -636,6 +675,61 @@ function resetStats() {
         saveStats();
         displayStats();
         showMessage('Statistics reset!');
+    }
+}
+
+// Save/Load game state (for daily play restriction)
+function saveGameState() {
+    const gameData = {
+        currentRow: gameState.currentRow,
+        guesses: gameState.guesses,
+        gameOver: gameState.gameOver,
+        isWin: gameState.isWin,
+        targetWord: gameState.targetWord,
+        date: getTodayString()
+    };
+    localStorage.setItem('wordWaveGameState', JSON.stringify(gameData));
+}
+
+function loadGameState() {
+    const saved = localStorage.getItem('wordWaveGameState');
+    if (saved) {
+        try {
+            const gameData = JSON.parse(saved);
+            
+            // Only load if it's from today
+            if (gameData.date === getTodayString()) {
+                gameState.currentRow = gameData.currentRow;
+                gameState.guesses = gameData.guesses || [];
+                gameState.gameOver = gameData.gameOver;
+                gameState.isWin = gameData.isWin;
+                gameState.targetWord = gameData.targetWord;
+                
+                // Recreate the board with previous guesses
+                createBoard();
+                gameState.guesses.forEach((guess, rowIndex) => {
+                    for (let i = 0; i < WORD_LENGTH; i++) {
+                        const tile = getTile(rowIndex, i);
+                        tile.textContent = guess[i];
+                        tile.classList.add('filled');
+                        
+                        // Apply colors
+                        if (guess[i] === gameState.targetWord[i]) {
+                            tile.classList.add('correct');
+                            updateKeyboard(guess[i], 'correct');
+                        } else if (gameState.targetWord.includes(guess[i])) {
+                            tile.classList.add('present');
+                            updateKeyboard(guess[i], 'present');
+                        } else {
+                            tile.classList.add('absent');
+                            updateKeyboard(guess[i], 'absent');
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error loading game state:', error);
+        }
     }
 }
 
