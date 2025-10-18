@@ -77,6 +77,17 @@ body {
     align-items: center;
 }
 
+.nav-logo-link {
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-logo-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
 .nav-logo {
     display: flex;
     align-items: center;
