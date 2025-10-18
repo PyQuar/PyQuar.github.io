@@ -22,8 +22,17 @@ export default async function handler(req, res) {
 
     // Validate required parameters
     if (!code || !client_id || !redirect_uri) {
+      console.error('Missing parameters:', { code: !!code, client_id: !!client_id, redirect_uri: !!redirect_uri });
       return res.status(400).json({ error: 'Missing required parameters' });
     }
+
+    // Check if client secret is configured
+    if (!process.env.GITHUB_CLIENT_SECRET) {
+      console.error('GITHUB_CLIENT_SECRET environment variable is not set!');
+      return res.status(500).json({ error: 'Server configuration error: Client secret not configured' });
+    }
+
+    console.log('Exchanging code for token...', { client_id, redirect_uri });
 
     // Exchange code for access token
     const response = await fetch('https://github.com/login/oauth/access_token', {
@@ -45,14 +54,22 @@ export default async function handler(req, res) {
     // Check for errors from GitHub
     if (data.error) {
       console.error('GitHub OAuth error:', data);
-      return res.status(400).json({ error: data.error_description || data.error });
+      return res.status(400).json({ 
+        error: data.error_description || data.error,
+        details: data 
+      });
     }
+
+    console.log('Successfully exchanged token');
 
     // Return the access token
     return res.status(200).json(data);
 
   } catch (error) {
     console.error('Token exchange error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
   }
 }
