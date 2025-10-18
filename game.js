@@ -47,42 +47,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Game initializing...');
     
     // Initialize authentication first
+    let cloudGameState = null;
     if (window.authManager) {
         await window.authManager.init();
-        await loadStatsWithSync();
+        cloudGameState = await loadStatsWithSync();
     } else {
         loadStats();
     }
     
     console.log('Stats after loading:', gameState.stats);
     console.log('Last played date:', gameState.lastPlayedDate);
+    console.log('Cloud game state:', cloudGameState);
     
     initializeGame();
     setupEventListeners();
     
     // Check if user already played today
     const today = getTodayString();
-    let lastPlayed = gameState.lastPlayedDate; // Use the one from cloud if authenticated
-    
-    // Fallback to localStorage if not synced from cloud
-    if (!lastPlayed) {
-        lastPlayed = localStorage.getItem('wordWaveLastPlayed');
-    }
+    let lastPlayed = gameState.lastPlayedDate;
     
     console.log('Today:', today, 'Last played:', lastPlayed);
     
-    if (lastPlayed === today) {
-        // User already played today
-        gameState.gameOver = true;
-        gameState.lastPlayedDate = today;
+    if (lastPlayed === today && cloudGameState) {
+        // User already played today - restore from cloud
+        console.log('Restoring game from cloud...');
+        gameState.gameOver = cloudGameState.gameOver || true;
+        gameState.isWin = cloudGameState.isWin;
+        gameState.currentRow = cloudGameState.currentRow || 0;
+        gameState.guesses = cloudGameState.guesses || [];
+        gameState.targetWord = cloudGameState.targetWord || getDailyWord();
         
-        // Load the previous game state (this will create the board with previous guesses)
-        loadGameState();
+        // Recreate the board with saved state
+        createBoard();
+        restoreBoardFromState(cloudGameState);
         
         // Show message
         setTimeout(() => {
             showMessage('You already played today! Come back tomorrow.', false);
             // Show result modal with countdown
+            if (gameState.isWin !== undefined) {
+                setTimeout(() => {
+                    showResultModal(gameState.isWin);
+                }, 1000);
+            }
+        }, 500);
+    } else if (lastPlayed === today) {
+        // Fallback to local storage if no cloud state
+        gameState.gameOver = true;
+        gameState.lastPlayedDate = today;
+        
+        // Load the previous game state from localStorage
+        loadGameState();
+        
+        // Show message
+        setTimeout(() => {
+            showMessage('You already played today! Come back tomorrow.', false);
             if (gameState.isWin !== undefined) {
                 setTimeout(() => {
                     showResultModal(gameState.isWin);
@@ -143,6 +162,33 @@ function createBoard() {
         
         gameBoard.appendChild(row);
     }
+}
+
+// Restore board from saved cloud state
+function restoreBoardFromState(cloudState) {
+    if (!cloudState || !cloudState.guesses) return;
+    
+    console.log('Restoring board with guesses:', cloudState.guesses);
+    
+    cloudState.guesses.forEach((guess, rowIndex) => {
+        for (let i = 0; i < WORD_LENGTH; i++) {
+            const tile = getTile(rowIndex, i);
+            tile.textContent = guess[i];
+            tile.classList.add('filled');
+            
+            // Apply colors
+            if (guess[i] === gameState.targetWord[i]) {
+                tile.classList.add('correct');
+                updateKeyboard(guess[i], 'correct');
+            } else if (gameState.targetWord.includes(guess[i])) {
+                tile.classList.add('present');
+                updateKeyboard(guess[i], 'present');
+            } else {
+                tile.classList.add('absent');
+                updateKeyboard(guess[i], 'absent');
+            }
+        }
+    });
 }
 
 // Setup event listeners
@@ -427,10 +473,21 @@ function updateStats(won) {
     
     saveStats();
     
-    // Also save to GitHub if authenticated (with lastPlayedDate)
+    // Also save to GitHub if authenticated (with lastPlayedDate and game state)
     if (window.authManager && window.authManager.isAuthenticated) {
         window.authManager.updateSyncStatus('syncing');
-        window.authManager.saveStats(gameState.stats, today);
+        
+        // Prepare game state for cloud storage
+        const cloudGameState = {
+            currentRow: gameState.currentRow,
+            guesses: gameState.guesses,
+            gameOver: gameState.gameOver,
+            isWin: gameState.isWin,
+            targetWord: gameState.targetWord,
+            date: today
+        };
+        
+        window.authManager.saveStats(gameState.stats, today, cloudGameState);
     }
 }
 
@@ -673,7 +730,7 @@ function loadStats() {
 async function loadStatsWithSync() {
     if (!window.authManager || !window.authManager.isAuthenticated) {
         loadStats();
-        return;
+        return null;
     }
     
     try {
@@ -682,25 +739,31 @@ async function loadStatsWithSync() {
         const parsedLocalStats = localStats ? JSON.parse(localStats) : null;
         const localLastPlayed = localStorage.getItem('wordWaveLastPlayed');
         
-        // Load cloud data (stats and lastPlayedDate)
+        // Load cloud data (stats, lastPlayedDate, and gameState)
         window.authManager.updateSyncStatus('syncing');
         const cloudData = await window.authManager.loadStats();
+        
+        console.log('Cloud data received:', cloudData);
+        
+        let cloudGameState = null;
         
         // Merge stats (take the better one)
         if (cloudData && cloudData.stats && parsedLocalStats) {
             gameState.stats = window.authManager.mergeStats(parsedLocalStats, cloudData.stats);
             // Use cloud lastPlayedDate if it exists (cloud is source of truth when authenticated)
             gameState.lastPlayedDate = cloudData.lastPlayedDate || localLastPlayed;
+            cloudGameState = cloudData.gameState;
             showMessage('Stats synced from cloud!');
         } else if (cloudData && cloudData.stats) {
             gameState.stats = cloudData.stats;
             gameState.lastPlayedDate = cloudData.lastPlayedDate;
+            cloudGameState = cloudData.gameState;
             showMessage('Stats loaded from cloud!');
         } else if (parsedLocalStats) {
             gameState.stats = parsedLocalStats;
             gameState.lastPlayedDate = localLastPlayed;
             // Upload local stats to cloud
-            await window.authManager.saveStats(gameState.stats, localLastPlayed);
+            await window.authManager.saveStats(gameState.stats, localLastPlayed, null);
         }
         
         // Save merged stats locally
@@ -709,10 +772,14 @@ async function loadStatsWithSync() {
             localStorage.setItem('wordWaveLastPlayed', gameState.lastPlayedDate);
         }
         
+        // Return the cloud game state for today's game restoration
+        return cloudGameState;
+        
     } catch (error) {
         console.error('Error syncing stats:', error);
         loadStats(); // Fallback to local stats
         window.authManager.updateSyncStatus('error');
+        return null;
     }
 }
 
@@ -725,9 +792,26 @@ function resetStats() {
             maxStreak: 0,
             guessDistribution: [0, 0, 0, 0, 0, 0]
         };
+        
+        // Clear lastPlayedDate
+        gameState.lastPlayedDate = null;
+        localStorage.removeItem('wordWaveLastPlayed');
+        
+        // Save reset stats locally
         saveStats();
         displayStats();
-        showMessage('Statistics reset!');
+        
+        // Also reset on GitHub Gists if authenticated
+        if (window.authManager && window.authManager.isAuthenticated) {
+            window.authManager.updateSyncStatus('syncing');
+            window.authManager.saveStats(gameState.stats, null, null).then(() => {
+                showMessage('Statistics reset (local and cloud)!');
+            }).catch(() => {
+                showMessage('Statistics reset locally!');
+            });
+        } else {
+            showMessage('Statistics reset!');
+        }
     }
 }
 

@@ -154,7 +154,7 @@ class AuthManager {
     }
 
     // Save stats to GitHub Gist
-    async saveStats(stats, lastPlayedDate = null) {
+    async saveStats(stats, lastPlayedDate = null, gameState = null) {
         if (!this.isAuthenticated) {
             console.log('Not authenticated, saving locally only');
             return false;
@@ -169,8 +169,9 @@ class AuthManager {
                         content: JSON.stringify({
                             stats: stats,
                             lastPlayedDate: lastPlayedDate,
+                            gameState: gameState, // Save today's game board state
                             lastUpdated: new Date().toISOString(),
-                            version: '1.0'
+                            version: '1.1'
                         }, null, 2)
                     }
                 }
@@ -262,10 +263,11 @@ class AuthManager {
                 const data = JSON.parse(fileContent);
                 console.log('Stats loaded from GitHub Gist');
                 this.updateSyncStatus('synced');
-                // Return both stats and lastPlayedDate
+                // Return stats, lastPlayedDate, and gameState
                 return {
                     stats: data.stats,
-                    lastPlayedDate: data.lastPlayedDate || null
+                    lastPlayedDate: data.lastPlayedDate || null,
+                    gameState: data.gameState || null
                 };
             }
 
