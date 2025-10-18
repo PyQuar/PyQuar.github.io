@@ -109,7 +109,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }, 500);
     } else {
-        // New game - create empty board
+        // New day - clear old game state and start fresh
+        console.log('New day detected! Clearing old game state...');
+        localStorage.removeItem('wordWaveGameState');
+        localStorage.removeItem('wordWaveLastPlayed');
+        
+        // Reset game state for new game
+        gameState.gameOver = false;
+        gameState.isWin = false;
+        gameState.currentRow = 0;
+        gameState.currentTile = 0;
+        gameState.currentGuess = '';
+        gameState.guesses = [];
+        gameState.lastPlayedDate = null;
+        
+        // Get today's word
+        gameState.targetWord = getDailyWord();
+        console.log('New daily word:', gameState.targetWord);
+        
+        // Create fresh board
         createBoard();
     }
     
