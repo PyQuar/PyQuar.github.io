@@ -54,6 +54,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeGame();
     setupEventListeners();
     createBoard();
+    
+    // Display stats after loading them
+    if (document.getElementById('gamesPlayed')) {
+        displayStats();
+    }
 });
 
 // Initialize game
@@ -454,13 +459,13 @@ function showResultModal(won) {
 
 // Display statistics
 function displayStats() {
-    document.getElementById('gamesPlayed').textContent = gameState.stats.gamesPlayed;
+    document.getElementById('gamesPlayed').textContent = gameState.stats.gamesPlayed || 0;
     document.getElementById('winPercentage').textContent = 
         gameState.stats.gamesPlayed > 0 
             ? Math.round((gameState.stats.gamesWon / gameState.stats.gamesPlayed) * 100) 
             : 0;
-    document.getElementById('currentStreak').textContent = gameState.stats.currentStreak;
-    document.getElementById('maxStreak').textContent = gameState.stats.maxStreak;
+    document.getElementById('currentStreak').textContent = gameState.stats.currentStreak || 0;
+    document.getElementById('maxStreak').textContent = gameState.stats.maxStreak || 0;
     
     // Display distribution
     const distribution = document.getElementById('distribution');
@@ -556,7 +561,27 @@ function saveStats() {
 function loadStats() {
     const saved = localStorage.getItem('wordWaveStats');
     if (saved) {
-        gameState.stats = JSON.parse(saved);
+        try {
+            const parsedStats = JSON.parse(saved);
+            // Validate and ensure all properties exist
+            gameState.stats = {
+                gamesPlayed: parsedStats.gamesPlayed || 0,
+                gamesWon: parsedStats.gamesWon || 0,
+                currentStreak: parsedStats.currentStreak || 0,
+                maxStreak: parsedStats.maxStreak || 0,
+                guessDistribution: parsedStats.guessDistribution || [0, 0, 0, 0, 0, 0]
+            };
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            // Reset to default stats if parsing fails
+            gameState.stats = {
+                gamesPlayed: 0,
+                gamesWon: 0,
+                currentStreak: 0,
+                maxStreak: 0,
+                guessDistribution: [0, 0, 0, 0, 0, 0]
+            };
+        }
     }
 }
 
