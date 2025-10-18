@@ -113,11 +113,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         createBoard();
     }
     
-    // Display stats after loading them
-    if (document.getElementById('gamesPlayed')) {
-        console.log('Calling displayStats...');
-        displayStats();
-    }
+    // Display stats after loading them (with slight delay to ensure DOM is ready)
+    setTimeout(() => {
+        if (document.getElementById('gamesPlayed')) {
+            console.log('Calling displayStats...');
+            console.log('Final gameState.stats:', gameState.stats);
+            displayStats();
+        }
+    }, 100);
 });
 
 // Initialize game
@@ -573,8 +576,9 @@ function showResultModal(won) {
 function displayStats() {
     console.log('displayStats called, current stats:', gameState.stats);
     
-    // Ensure stats object exists
-    if (!gameState.stats) {
+    // Ensure stats object exists with valid defaults
+    if (!gameState.stats || typeof gameState.stats !== 'object') {
+        console.warn('Stats object invalid, resetting to defaults');
         gameState.stats = {
             gamesPlayed: 0,
             gamesWon: 0,
@@ -584,18 +588,27 @@ function displayStats() {
         };
     }
     
-    const gamesPlayed = gameState.stats.gamesPlayed || 0;
-    const gamesWon = gameState.stats.gamesWon || 0;
-    const currentStreak = gameState.stats.currentStreak || 0;
-    const maxStreak = gameState.stats.maxStreak || 0;
+    // Force convert to numbers and handle NaN
+    const gamesPlayed = parseInt(gameState.stats.gamesPlayed) || 0;
+    const gamesWon = parseInt(gameState.stats.gamesWon) || 0;
+    const currentStreak = parseInt(gameState.stats.currentStreak) || 0;
+    const maxStreak = parseInt(gameState.stats.maxStreak) || 0;
     
-    document.getElementById('gamesPlayed').textContent = gamesPlayed;
-    document.getElementById('winPercentage').textContent = 
-        gamesPlayed > 0 
-            ? Math.round((gamesWon / gamesPlayed) * 100) 
-            : 0;
-    document.getElementById('currentStreak').textContent = currentStreak;
-    document.getElementById('maxStreak').textContent = maxStreak;
+    console.log('Computed values:', { gamesPlayed, gamesWon, currentStreak, maxStreak });
+    
+    // Update DOM elements
+    const gamesPlayedEl = document.getElementById('gamesPlayed');
+    const winPercentageEl = document.getElementById('winPercentage');
+    const currentStreakEl = document.getElementById('currentStreak');
+    const maxStreakEl = document.getElementById('maxStreak');
+    
+    if (gamesPlayedEl) gamesPlayedEl.textContent = gamesPlayed;
+    if (winPercentageEl) {
+        const winPct = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
+        winPercentageEl.textContent = winPct;
+    }
+    if (currentStreakEl) currentStreakEl.textContent = currentStreak;
+    if (maxStreakEl) maxStreakEl.textContent = maxStreak;
     
     // Display distribution
     const distribution = document.getElementById('distribution');
