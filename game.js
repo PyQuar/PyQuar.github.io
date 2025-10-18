@@ -602,13 +602,45 @@ function displayStats() {
     const currentStreakEl = document.getElementById('currentStreak');
     const maxStreakEl = document.getElementById('maxStreak');
     
-    if (gamesPlayedEl) gamesPlayedEl.textContent = gamesPlayed;
+    console.log('DOM Elements found:', {
+        gamesPlayedEl: !!gamesPlayedEl,
+        winPercentageEl: !!winPercentageEl,
+        currentStreakEl: !!currentStreakEl,
+        maxStreakEl: !!maxStreakEl
+    });
+    
+    if (gamesPlayedEl) {
+        const oldValue = gamesPlayedEl.textContent;
+        gamesPlayedEl.textContent = String(gamesPlayed);
+        console.log('Set gamesPlayed from', oldValue, 'to:', gamesPlayedEl.textContent, '| Value type:', typeof gamesPlayed, '| Value:', gamesPlayed);
+    } else {
+        console.error('gamesPlayed element not found!');
+    }
+    
     if (winPercentageEl) {
         const winPct = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
-        winPercentageEl.textContent = winPct;
+        const oldValue = winPercentageEl.textContent;
+        winPercentageEl.textContent = String(winPct);
+        console.log('Set winPercentage from', oldValue, 'to:', winPercentageEl.textContent);
+    } else {
+        console.error('winPercentage element not found!');
     }
-    if (currentStreakEl) currentStreakEl.textContent = currentStreak;
-    if (maxStreakEl) maxStreakEl.textContent = maxStreak;
+    
+    if (currentStreakEl) {
+        const oldValue = currentStreakEl.textContent;
+        currentStreakEl.textContent = String(currentStreak);
+        console.log('Set currentStreak from', oldValue, 'to:', currentStreakEl.textContent);
+    } else {
+        console.error('currentStreak element not found!');
+    }
+    
+    if (maxStreakEl) {
+        const oldValue = maxStreakEl.textContent;
+        maxStreakEl.textContent = String(maxStreak);
+        console.log('Set maxStreak from', oldValue, 'to:', maxStreakEl.textContent);
+    } else {
+        console.error('maxStreak element not found!');
+    }
     
     // Display distribution
     const distribution = document.getElementById('distribution');
@@ -735,7 +767,15 @@ function loadStats() {
             };
         }
     } else {
-        console.log('No saved stats found');
+        console.log('No saved stats found, initializing defaults');
+        // Initialize with default stats if nothing saved
+        gameState.stats = {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            currentStreak: 0,
+            maxStreak: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        };
     }
 }
 

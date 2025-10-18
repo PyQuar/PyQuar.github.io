@@ -617,10 +617,13 @@
     font-family: 'Poppins', sans-serif;
     font-size: 2.5rem;
     font-weight: 900;
+    color: #2dd4bf; /* Fallback color */
     background: linear-gradient(135deg, #20a39e, #2dd4bf);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    /* Ensure text is always visible */
+    display: block;
 }
 
 .stat-label {
