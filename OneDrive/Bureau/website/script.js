@@ -47,8 +47,10 @@ function updateCountdown() {
             comingSoonEl.textContent = '✨ Welcome to Wavy Essai Press Club!';
         }
         
-        // You can redirect to the main site or reveal content here
-        // window.location.href = 'main.html';
+        // Redirect to main page after 3 seconds
+        setTimeout(() => {
+            window.location.href = 'main.html';
+        }, 3000);
     }
 }
 
