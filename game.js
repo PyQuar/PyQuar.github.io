@@ -159,7 +159,18 @@ function initializeGame() {
 
 // Get daily word (same word for everyone each day)
 function getDailyWord() {
-    const today = new Date();
+    // Check if dev mode has overridden the date
+    const devDate = localStorage.getItem('wordWaveDevDate');
+    let today;
+    
+    if (devDate) {
+        // Use the dev date override
+        today = new Date(devDate + 'T00:00:00');
+    } else {
+        // Use actual current date
+        today = new Date();
+    }
+    
     const start = new Date(today.getFullYear(), 0, 0);
     const diff = today - start;
     const oneDay = 1000 * 60 * 60 * 24;
