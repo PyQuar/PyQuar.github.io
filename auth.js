@@ -3,13 +3,13 @@
 
 const AUTH_CONFIG = {
     // You'll need to create a GitHub OAuth App at: https://github.com/settings/developers
-    // Set Homepage URL to: https://pyquar.github.io
-    // Set Authorization callback URL to: https://pyquar.github.io/game.html
-    CLIENT_ID: 'Ov23lio9xRVWeE2HuJ6w', // Replace with your GitHub OAuth App Client ID
+    // Set Homepage URL to: https://wavyessai.me
+    // Set Authorization callback URL to: https://wavyessai.me/game.html
+    CLIENT_ID: 'Ov23lio9xRVWeE2HuJ6w', // Your GitHub OAuth App Client ID
     REDIRECT_URI: window.location.origin + '/game.html',
     SCOPE: 'gist',
     GIST_FILENAME: 'word-wave-stats.json',
-    PROXY_URL: 'https://vercel.com/pyquars-projects/word-wave-auth-proxy/CnLKPJp3XkKbLwL2ahrG2ZmkCmP6' // Replace with your Vercel proxy URL (see GITHUB_AUTH_SETUP.md)
+    PROXY_URL: 'https://word-wave-auth-proxy-dsgufe9lw-pyquars-projects.vercel.app/api/token' // Vercel proxy endpoint
 };
 
 class AuthManager {
