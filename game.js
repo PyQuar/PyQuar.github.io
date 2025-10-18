@@ -141,10 +141,13 @@ function getDailyWord() {
     return WORD_LIST[index];
 }
 
-// Get today's date as string (YYYY-MM-DD)
+// Get today's date as string (YYYY-MM-DD) in local timezone
 function getTodayString() {
     const today = new Date();
-    return today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // Create game board
