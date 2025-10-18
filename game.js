@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Last played date:', gameState.lastPlayedDate);
     console.log('Cloud game state:', cloudGameState);
     
-    initializeGame();
     setupEventListeners();
     
     // Check if user already played today
@@ -76,6 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         gameState.currentRow = cloudGameState.currentRow || 0;
         gameState.guesses = cloudGameState.guesses || [];
         gameState.targetWord = cloudGameState.targetWord || getDailyWord();
+        
+        initializeGame();
         
         // Recreate the board with saved state
         createBoard();
@@ -95,6 +96,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fallback to local storage if no cloud state
         gameState.gameOver = true;
         gameState.lastPlayedDate = today;
+        
+        initializeGame();
         
         // Load the previous game state from localStorage
         loadGameState();
@@ -123,9 +126,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         gameState.guesses = [];
         gameState.lastPlayedDate = null;
         
-        // Get today's word
-        gameState.targetWord = getDailyWord();
-        console.log('New daily word:', gameState.targetWord);
+        // Get today's word (must be called AFTER clearing state)
+        const todayWord = getDailyWord();
+        gameState.targetWord = todayWord;
+        console.log('New daily word for', today, ':', todayWord);
+        
+        // Initialize game
+        initializeGame();
         
         // Create fresh board
         createBoard();
