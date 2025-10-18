@@ -9,7 +9,7 @@ const WORD_LIST_CONFIG = {
     // To create: Go to gist.github.com, create a public gist named "wordwave-words.json"
     // with content: {"words": ["PRESS", "STORY", ...]}
     GIST_USERNAME: 'PyQuar',
-    GIST_ID: '', // Will be filled after you create the gist
+    GIST_ID: '6c2eed922783b4e800002522083671d7', // Will be filled after you create the gist
     CACHE_KEY: 'wordWaveWordListCache',
     CACHE_DURATION: 1000 * 60 * 60 // 1 hour in milliseconds
 };
