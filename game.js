@@ -55,13 +55,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     console.log('Stats after loading:', gameState.stats);
+    console.log('Last played date:', gameState.lastPlayedDate);
     
     initializeGame();
     setupEventListeners();
     
     // Check if user already played today
     const today = getTodayString();
-    const lastPlayed = localStorage.getItem('wordWaveLastPlayed');
+    let lastPlayed = gameState.lastPlayedDate; // Use the one from cloud if authenticated
+    
+    // Fallback to localStorage if not synced from cloud
+    if (!lastPlayed) {
+        lastPlayed = localStorage.getItem('wordWaveLastPlayed');
+    }
     
     console.log('Today:', today, 'Last played:', lastPlayed);
     
@@ -411,6 +417,7 @@ function updateStats(won) {
     }
     
     // Mark today as played
+    // Mark today as played
     const today = getTodayString();
     localStorage.setItem('wordWaveLastPlayed', today);
     gameState.lastPlayedDate = today;
@@ -420,10 +427,10 @@ function updateStats(won) {
     
     saveStats();
     
-    // Also save to GitHub if authenticated
+    // Also save to GitHub if authenticated (with lastPlayedDate)
     if (window.authManager && window.authManager.isAuthenticated) {
         window.authManager.updateSyncStatus('syncing');
-        window.authManager.saveStats(gameState.stats);
+        window.authManager.saveStats(gameState.stats, today);
     }
 }
 
@@ -673,26 +680,34 @@ async function loadStatsWithSync() {
         // Load local stats
         const localStats = localStorage.getItem('wordWaveStats');
         const parsedLocalStats = localStats ? JSON.parse(localStats) : null;
+        const localLastPlayed = localStorage.getItem('wordWaveLastPlayed');
         
-        // Load cloud stats
+        // Load cloud data (stats and lastPlayedDate)
         window.authManager.updateSyncStatus('syncing');
-        const cloudStats = await window.authManager.loadStats();
+        const cloudData = await window.authManager.loadStats();
         
         // Merge stats (take the better one)
-        if (cloudStats && parsedLocalStats) {
-            gameState.stats = window.authManager.mergeStats(parsedLocalStats, cloudStats);
+        if (cloudData && cloudData.stats && parsedLocalStats) {
+            gameState.stats = window.authManager.mergeStats(parsedLocalStats, cloudData.stats);
+            // Use cloud lastPlayedDate if it exists (cloud is source of truth when authenticated)
+            gameState.lastPlayedDate = cloudData.lastPlayedDate || localLastPlayed;
             showMessage('Stats synced from cloud!');
-        } else if (cloudStats) {
-            gameState.stats = cloudStats;
+        } else if (cloudData && cloudData.stats) {
+            gameState.stats = cloudData.stats;
+            gameState.lastPlayedDate = cloudData.lastPlayedDate;
             showMessage('Stats loaded from cloud!');
         } else if (parsedLocalStats) {
             gameState.stats = parsedLocalStats;
+            gameState.lastPlayedDate = localLastPlayed;
             // Upload local stats to cloud
-            await window.authManager.saveStats(gameState.stats);
+            await window.authManager.saveStats(gameState.stats, localLastPlayed);
         }
         
         // Save merged stats locally
         saveStats();
+        if (gameState.lastPlayedDate) {
+            localStorage.setItem('wordWaveLastPlayed', gameState.lastPlayedDate);
+        }
         
     } catch (error) {
         console.error('Error syncing stats:', error);
