@@ -1070,36 +1070,42 @@ function loadGameState() {
                 gameState.isWin = gameData.isWin;
                 gameState.targetWord = gameData.targetWord;
                 
-                // Recreate the board with previous guesses
-                createBoard();
+                // NOTE: createBoard() should be called BEFORE this function
+                // DO NOT call createBoard() here to avoid clearing the board
                 
                 // Restore completed rows
                 gameState.guesses.forEach((guess, rowIndex) => {
                     for (let i = 0; i < WORD_LENGTH; i++) {
                         const tile = getTile(rowIndex, i);
-                        tile.textContent = guess[i];
-                        tile.classList.add('filled');
-                        
-                        // Apply colors
-                        if (guess[i] === gameState.targetWord[i]) {
-                            tile.classList.add('correct');
-                            updateKeyboard(guess[i], 'correct');
-                        } else if (gameState.targetWord.includes(guess[i])) {
-                            tile.classList.add('present');
-                            updateKeyboard(guess[i], 'present');
-                        } else {
-                            tile.classList.add('absent');
-                            updateKeyboard(guess[i], 'absent');
+                        if (tile) {
+                            tile.textContent = guess[i];
+                            tile.classList.add('filled');
+                            
+                            // Apply colors
+                            if (guess[i] === gameState.targetWord[i]) {
+                                tile.classList.add('correct');
+                                updateKeyboard(guess[i], 'correct');
+                            } else if (gameState.targetWord.includes(guess[i])) {
+                                tile.classList.add('present');
+                                updateKeyboard(guess[i], 'present');
+                            } else {
+                                tile.classList.add('absent');
+                                updateKeyboard(guess[i], 'absent');
+                            }
                         }
                     }
                 });
                 
                 // Restore current typing on the current row
+                console.log('Restoring current guess:', gameState.currentGuess);
                 if (gameState.currentGuess && !gameState.gameOver) {
                     for (let i = 0; i < gameState.currentGuess.length; i++) {
                         const tile = getTile(gameState.currentRow, i);
-                        tile.textContent = gameState.currentGuess[i];
-                        tile.classList.add('filled');
+                        if (tile) {
+                            tile.textContent = gameState.currentGuess[i];
+                            tile.classList.add('filled');
+                            console.log(`Restored letter ${gameState.currentGuess[i]} at position ${i}`);
+                        }
                     }
                 }
             }
