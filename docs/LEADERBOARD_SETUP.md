@@ -85,10 +85,16 @@ Le Gist `wordwave-leaderboard.json` contient :
         "gamesWon": 8,
         "currentStreak": 3,
         "maxStreak": 5,
-        "guessDistribution": [0, 2, 3, 2, 1, 0]
+        "guessDistribution": [0, 2, 3, 2, 1, 0]  // [1 essai, 2 essais, ..., 6 essais]
       },
-      "lastPlayedDate": "2025-10-19",
-      "gameState": {...},
+      "lastPlayedDate": "2025-10-19",  // Date du dernier jeu (format YYYY-MM-DD)
+      "gameState": {                    // État de la dernière board jouée
+        "targetWord": "PROBE",
+        "guesses": ["PRESS", "PROBE"],
+        "gameOver": true,
+        "isWin": true,
+        "currentRow": 2
+      },
       "lastUpdated": "2025-10-19T12:00:00.000Z"
     },
     "autreJoueur": {
@@ -103,13 +109,28 @@ Le Gist `wordwave-leaderboard.json` contient :
 ## 📊 Classement
 
 Les joueurs sont classés par :
-1. **Taux de victoire** (% de parties gagnées) - Priorité 1
-2. **Nombre de parties jouées** - En cas d'égalité
+1. **Nombre de victoires** (plus = mieux) - Critère principal
+2. **Total des tentatives** (moins = mieux) - En cas d'égalité
 
-Exemple :
-- Joueur A : 80% (8/10 victoires)
-- Joueur B : 75% (15/20 victoires)
-- → Joueur A est premier (meilleur taux)
+### Comment sont comptées les tentatives ?
+
+Le total des tentatives est calculé à partir de la distribution des victoires :
+- Si tu gagnes en 1 essai : +1 tentative
+- Si tu gagnes en 2 essais : +2 tentatives
+- Si tu gagnes en 3 essais : +3 tentatives
+- etc.
+
+**Exemple :**
+- Joueur A : 10 victoires, 25 tentatives totales (moyenne : 2.5 essais/victoire)
+- Joueur B : 10 victoires, 30 tentatives totales (moyenne : 3.0 essais/victoire)
+- → **Joueur A est premier** (même nombre de victoires, mais moins de tentatives)
+
+### Pourquoi ce système ?
+
+✅ Récompense la **consistance** - Gagner souvent compte le plus
+✅ Récompense l'**efficacité** - Gagner rapidement départage les égalités
+✅ **Équitable** - Pas de pénalité pour jouer plus (seules les victoires comptent)
+✅ **Anti-triche** - Le système sauvegarde la dernière board jouée et la date
 
 ## 🔧 Fonctions API Disponibles
 
@@ -153,6 +174,43 @@ async function displayLeaderboard() {
 - **Lecture** : Tout le monde (Gist public)
 - **Écriture** : Seulement les joueurs connectés (pour leurs propres stats)
 - **Gestion** : Toi (propriétaire du Gist)
+
+## 🛡️ Protection Anti-Triche
+
+Le système empêche les joueurs de tricher de plusieurs façons :
+
+### 1. Une partie par jour maximum
+- Le système sauvegarde `lastPlayedDate` pour chaque joueur
+- Le jeu vérifie cette date avant de permettre une nouvelle partie
+- Si `lastPlayedDate` = aujourd'hui → le joueur ne peut pas rejouer
+
+### 2. Sauvegarde de la board complète
+- Chaque partie jouée est sauvegardée dans `gameState` :
+  - Le mot cible (`targetWord`)
+  - Toutes les tentatives (`guesses`)
+  - L'état final (`gameOver`, `isWin`)
+  - La rangée actuelle (`currentRow`)
+- Impossible de modifier les résultats après coup
+
+### 3. Vérification côté serveur
+- Les stats sont dans TON Gist (contrôle central)
+- Les joueurs ne peuvent modifier que leurs propres données
+- GitHub API valide l'authentification
+
+### 4. Détection d'incohérences
+Le système peut détecter :
+- Nombre de victoires > nombre de parties jouées
+- Distribution invalide (somme ≠ victoires)
+- Dates futures
+- Multiple parties le même jour
+
+### Comment un joueur pourrait-il essayer de tricher ?
+
+❌ **Supprimer localStorage** → Le système recharge depuis le Gist
+❌ **Changer la date système** → Le serveur utilise la date réelle
+❌ **Modifier le code client** → Les stats sont validées côté serveur
+❌ **Rejouer plusieurs fois** → `lastPlayedDate` l'empêche
+✅ **Aucune triche possible sans accès à ton compte GitHub**
 
 ## ⚠️ Important
 

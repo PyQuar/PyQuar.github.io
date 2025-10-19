@@ -315,16 +315,27 @@ class AuthManager {
             const leaderboard = await this.loadLeaderboard();
             const players = Object.values(leaderboard.players);
             
-            // Sort by win rate, then by games played
+            // Calculate total attempts for each player
+            players.forEach(player => {
+                // Total attempts = sum of all guesses from distribution
+                // guessDistribution[i] = number of games won in (i+1) attempts
+                player.totalAttempts = 0;
+                if (player.stats.guessDistribution) {
+                    player.stats.guessDistribution.forEach((count, index) => {
+                        player.totalAttempts += count * (index + 1);
+                    });
+                }
+            });
+            
+            // Sort by: 1) Number of wins (higher first), 2) Total attempts (lower first)
             players.sort((a, b) => {
-                const winRateA = a.stats.gamesPlayed > 0 ? (a.stats.gamesWon / a.stats.gamesPlayed) : 0;
-                const winRateB = b.stats.gamesPlayed > 0 ? (b.stats.gamesWon / b.stats.gamesPlayed) : 0;
-                
-                if (winRateB !== winRateA) {
-                    return winRateB - winRateA; // Higher win rate first
+                // Primary criterion: Number of wins (descending)
+                if (b.stats.gamesWon !== a.stats.gamesWon) {
+                    return b.stats.gamesWon - a.stats.gamesWon;
                 }
                 
-                return b.stats.gamesPlayed - a.stats.gamesPlayed; // More games played as tiebreaker
+                // Tiebreaker: Total attempts (ascending - fewer attempts is better)
+                return a.totalAttempts - b.totalAttempts;
             });
             
             return players.slice(0, limit);
@@ -438,14 +449,17 @@ window.showLeaderboard = async function(limit = 10) {
         const players = await window.authManager.getTopPlayers(limit);
         
         console.log('\n🏆 === WORD WAVE LEADERBOARD === 🏆\n');
+        console.log('📊 Classement par : 1) Victoires (↓), 2) Total tentatives (↑)\n');
         console.table(players.map((p, i) => ({
             Rank: i + 1,
             Player: p.username,
+            'Victories': p.stats.gamesWon,
+            'Total Attempts': p.totalAttempts || 0,
             'Games Played': p.stats.gamesPlayed,
-            'Games Won': p.stats.gamesWon,
             'Win Rate': p.stats.gamesPlayed > 0 ? 
                 `${Math.round((p.stats.gamesWon / p.stats.gamesPlayed) * 100)}%` : '0%',
-            'Current Streak': p.stats.currentStreak,
+            'Avg Attempts': p.stats.gamesWon > 0 ? 
+                `${(p.totalAttempts / p.stats.gamesWon).toFixed(1)}` : '0',
             'Best Streak': p.stats.maxStreak
         })));
         
