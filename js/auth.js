@@ -10,7 +10,7 @@ const AUTH_CONFIG = {
     SCOPE: 'gist',
     
     // Central leaderboard Gist (owned by admin/PyQuar)
-    LEADERBOARD_GIST_ID: '', // TODO: Set this after creating the gist with createLeaderboardGist()
+    LEADERBOARD_GIST_ID: '2acc97044fc86cb79c96b02a5bd1b5fb', // TODO: Set this after creating the gist with createLeaderboardGist()
     LEADERBOARD_OWNER: 'PyQuar', // GitHub username who owns the leaderboard
     
     PROXY_URL: 'https://word-wave-auth-proxy.vercel.app/api/token' // Permanent Vercel production URL
