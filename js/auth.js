@@ -10,10 +10,11 @@ const AUTH_CONFIG = {
     SCOPE: 'gist',
     
     // Central leaderboard Gist (owned by admin/PyQuar)
-    LEADERBOARD_GIST_ID: '2acc97044fc86cb79c96b02a5bd1b5fb', // TODO: Set this after creating the gist with createLeaderboardGist()
+    LEADERBOARD_GIST_ID: '2acc97044fc86cb79c96b02a5bd1b5fb',
     LEADERBOARD_OWNER: 'PyQuar', // GitHub username who owns the leaderboard
     
-    PROXY_URL: 'https://word-wave-auth-proxy.vercel.app/api/token' // Permanent Vercel production URL
+    PROXY_URL: 'https://word-wave-auth-proxy.vercel.app/api/token', // Permanent Vercel production URL
+    LEADERBOARD_UPDATE_URL: 'https://word-wave-auth-proxy.vercel.app/api/update-leaderboard' // Leaderboard update endpoint
 };
 
 class AuthManager {
@@ -159,16 +160,18 @@ class AuthManager {
 
     // Save stats to central leaderboard Gist
     async saveStats(stats, lastPlayedDate = null, gameState = null) {
-        if (!this.isAuthenticated || !this.user) {
+        if (!this.isAuthenticated || !this.user || !this.token) {
             console.log('Not authenticated, saving locally only');
             return false;
         }
 
+        if (!AUTH_CONFIG.LEADERBOARD_UPDATE_URL) {
+            console.warn('Leaderboard update endpoint not configured');
+            return false;
+        }
+
         try {
-            // Get current leaderboard data
-            const leaderboard = await this.loadLeaderboard();
-            
-            // Update player's data
+            // Prepare player data
             const playerData = {
                 username: this.user.login,
                 avatar: this.user.avatar_url,
@@ -177,22 +180,36 @@ class AuthManager {
                 gameState: gameState,
                 lastUpdated: new Date().toISOString()
             };
-            
-            leaderboard.players[this.user.login] = playerData;
-            leaderboard.lastUpdated = new Date().toISOString();
-            
-            // Save back to central Gist
-            const saved = await this.updateLeaderboard(leaderboard);
-            
-            if (saved) {
-                console.log('Stats saved to leaderboard');
-                this.updateSyncStatus('synced');
-                return true;
+
+            console.log('Updating leaderboard via proxy for:', this.user.login);
+
+            // Send update request to our proxy endpoint
+            const response = await fetch(AUTH_CONFIG.LEADERBOARD_UPDATE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify({
+                    playerData: playerData,
+                    gistId: AUTH_CONFIG.LEADERBOARD_GIST_ID
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Failed to update leaderboard:', response.status, errorData);
+                this.updateSyncStatus('error');
+                return false;
             }
-            
-            return false;
+
+            const result = await response.json();
+            console.log('Leaderboard updated successfully:', result);
+            this.updateSyncStatus('synced');
+            return true;
+
         } catch (error) {
-            console.error('Error saving to leaderboard:', error);
+            console.error('Error updating leaderboard:', error);
             this.updateSyncStatus('error');
             return false;
         }
@@ -299,12 +316,17 @@ class AuthManager {
             });
 
             if (!response.ok) {
+                // 404 or 403 means user doesn't have permission to update this Gist
+                if (response.status === 404 || response.status === 403) {
+                    console.warn(`Permission denied to update leaderboard (HTTP ${response.status}). Only the Gist owner can update it.`);
+                    return false;
+                }
                 throw new Error(`HTTP ${response.status}`);
             }
 
             return true;
         } catch (error) {
-            console.error('Error updating leaderboard:', error);
+            console.warn('Error updating leaderboard:', error.message);
             return false;
         }
     }
