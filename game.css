@@ -604,43 +604,50 @@
 }
 
 /* Statistics */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    justify-content: center;
-}
-
-.stat-box {
-    text-align: center;
-    padding: 20px 10px;
-    background: linear-gradient(135deg, rgba(29, 78, 216, 0.1), rgba(32, 163, 158, 0.1));
+.stats-summary {
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.05), rgba(32, 163, 158, 0.05));
     border: 2px solid rgba(45, 212, 191, 0.2);
     border-radius: 15px;
-    min-width: 100px;
+    padding: 20px;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.stat-number {
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.summary-row:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.summary-label {
     font-family: 'Poppins', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #2dd4bf; /* Fallback color */
-    background: linear-gradient(135deg, #20a39e, #2dd4bf);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    /* Ensure text is always visible */
-    display: block;
+    font-size: 1rem;
+    color: #a0a0a0;
+    font-weight: 500;
 }
 
-.stat-label {
-    color: #a0a0a0;
-    font-size: 0.85rem;
-    margin-top: 5px;
+.summary-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2dd4bf;
+    min-width: 60px;
+    text-align: right;
 }
 
 .distribution {
@@ -873,10 +880,22 @@
         font-size: 1.5rem;
     }
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 320px;
-        gap: 12px;
+    .stats-summary {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    .summary-row {
+        padding: 10px 12px;
+        margin-bottom: 6px;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+    }
+
+    .summary-value {
+        font-size: 1.1rem;
     }
 
     .key {

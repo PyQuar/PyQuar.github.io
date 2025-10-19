@@ -735,59 +735,35 @@ function displayStats() {
         };
     }
     
-    // Force convert to numbers and handle NaN
-    const gamesPlayed = parseInt(gameState.stats.gamesPlayed) || 0;
-    const gamesWon = parseInt(gameState.stats.gamesWon) || 0;
-    const currentStreak = parseInt(gameState.stats.currentStreak) || 0;
-    const maxStreak = parseInt(gameState.stats.maxStreak) || 0;
+    // Force convert to numbers and handle NaN - use Number() for better conversion
+    const gamesPlayed = Number(gameState.stats.gamesPlayed) || 0;
+    const gamesWon = Number(gameState.stats.gamesWon) || 0;
+    const currentStreak = Number(gameState.stats.currentStreak) || 0;
+    const maxStreak = Number(gameState.stats.maxStreak) || 0;
     
-    console.log('Computed values:', { gamesPlayed, gamesWon, currentStreak, maxStreak });
+    // Calculate win percentage
+    const winPct = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
     
-    // Update DOM elements
-    const gamesPlayedEl = document.getElementById('gamesPlayed');
-    const winPercentageEl = document.getElementById('winPercentage');
-    const currentStreakEl = document.getElementById('currentStreak');
-    const maxStreakEl = document.getElementById('maxStreak');
+    console.log('Computed values:', { gamesPlayed, gamesWon, winPct, currentStreak, maxStreak });
     
-    console.log('DOM Elements found:', {
-        gamesPlayedEl: !!gamesPlayedEl,
-        winPercentageEl: !!winPercentageEl,
-        currentStreakEl: !!currentStreakEl,
-        maxStreakEl: !!maxStreakEl
+    // Update DOM elements with safe values
+    const updates = [
+        { id: 'gamesPlayed', value: gamesPlayed },
+        { id: 'gamesWon', value: gamesWon },
+        { id: 'winPercentage', value: winPct + '%' },
+        { id: 'currentStreak', value: currentStreak },
+        { id: 'maxStreak', value: maxStreak }
+    ];
+    
+    updates.forEach(({ id, value }) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = String(value);
+            console.log(`✓ Set ${id} to:`, value);
+        } else {
+            console.error(`✗ Element #${id} not found!`);
+        }
     });
-    
-    if (gamesPlayedEl) {
-        const oldValue = gamesPlayedEl.textContent;
-        gamesPlayedEl.textContent = String(gamesPlayed);
-        console.log('Set gamesPlayed from', oldValue, 'to:', gamesPlayedEl.textContent, '| Value type:', typeof gamesPlayed, '| Value:', gamesPlayed);
-    } else {
-        console.error('gamesPlayed element not found!');
-    }
-    
-    if (winPercentageEl) {
-        const winPct = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
-        const oldValue = winPercentageEl.textContent;
-        winPercentageEl.textContent = String(winPct);
-        console.log('Set winPercentage from', oldValue, 'to:', winPercentageEl.textContent);
-    } else {
-        console.error('winPercentage element not found!');
-    }
-    
-    if (currentStreakEl) {
-        const oldValue = currentStreakEl.textContent;
-        currentStreakEl.textContent = String(currentStreak);
-        console.log('Set currentStreak from', oldValue, 'to:', currentStreakEl.textContent);
-    } else {
-        console.error('currentStreak element not found!');
-    }
-    
-    if (maxStreakEl) {
-        const oldValue = maxStreakEl.textContent;
-        maxStreakEl.textContent = String(maxStreak);
-        console.log('Set maxStreak from', oldValue, 'to:', maxStreakEl.textContent);
-    } else {
-        console.error('maxStreak element not found!');
-    }
     
     // Display distribution
     const distribution = document.getElementById('distribution');

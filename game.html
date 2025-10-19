@@ -12,11 +12,12 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="clublogo.png" alt="Wavy Essai Logo">
-                <span>WAVY ESSAI</span>
-            </div>
+            <a href="index.html" class="nav-logo-link">
+                <div class="nav-logo">
+                    <img src="clublogo.png" alt="Wavy Essai Logo">
+                    <span>WAVY ESSAI</span>
+                </div>
+            </a>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="index.html#about" class="nav-link">About</a></li>
@@ -210,22 +211,26 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-number" id="gamesPlayed">0</div>
-                        <div class="stat-label">Played</div>
+                <div class="stats-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">Games Played:</span>
+                        <span class="summary-value" id="gamesPlayed">0</span>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-number" id="winPercentage">0</div>
-                        <div class="stat-label">Win %</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Games Won:</span>
+                        <span class="summary-value" id="gamesWon">0</span>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-number" id="currentStreak">0</div>
-                        <div class="stat-label">Current Streak</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Win Rate:</span>
+                        <span class="summary-value" id="winPercentage">0%</span>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-number" id="maxStreak">0</div>
-                        <div class="stat-label">Max Streak</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Current Streak:</span>
+                        <span class="summary-value" id="currentStreak">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Best Streak:</span>
+                        <span class="summary-value" id="maxStreak">0</span>
                     </div>
                 </div>
 
