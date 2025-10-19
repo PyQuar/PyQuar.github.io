@@ -342,6 +342,13 @@ function setupEventListeners() {
     
     // Modal controls
     document.getElementById('helpBtn').addEventListener('click', () => openModal('helpModal'));
+    document.getElementById('leaderboardBtn').addEventListener('click', () => {
+        openModal('leaderboardModal');
+        // Load leaderboard data when modal opens
+        if (typeof renderLeaderboardTop === 'function') {
+            renderLeaderboardTop(10);
+        }
+    });
     document.getElementById('statsBtn').addEventListener('click', () => {
         openModal('statsModal');
         displayStats();

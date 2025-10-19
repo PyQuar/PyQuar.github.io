@@ -317,11 +317,12 @@
             return s.replace(/[&<>"'`]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;",'`':'&#96;'})[c]);
         }
 
-        document.getElementById('refreshLeaderboardBtn').addEventListener('click', () => renderLeaderboardTop(10));
-
-        // Load leaderboard when modal opens
-        document.getElementById('leaderboardBtn').addEventListener('click', () => {
-            renderLeaderboardTop(10);
+        // Refresh button in the modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const refreshBtn = document.getElementById('refreshLeaderboardBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => renderLeaderboardTop(10));
+            }
         });
     </script>
 
