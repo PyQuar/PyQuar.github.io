@@ -147,6 +147,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Create fresh board
         createBoard();
+        
+        // Check if there's a cloud game in progress for today
+        if (cloudGameState && cloudGameState.date === today && !cloudGameState.gameOver) {
+            console.log('Found cloud game in progress for today, restoring...');
+            gameState.currentRow = cloudGameState.currentRow || 0;
+            gameState.currentTile = cloudGameState.currentTile || 0;
+            gameState.currentGuess = cloudGameState.currentGuess || '';
+            gameState.guesses = cloudGameState.guesses || [];
+            gameState.targetWord = cloudGameState.targetWord || todayWord;
+            
+            // Restore the board
+            restoreBoardFromState(cloudGameState);
+            
+            // Restore current typing on the current row
+            if (gameState.currentGuess && !gameState.gameOver) {
+                for (let i = 0; i < gameState.currentGuess.length; i++) {
+                    const tile = getTile(gameState.currentRow, i);
+                    tile.textContent = gameState.currentGuess[i];
+                    tile.classList.add('filled');
+                }
+            }
+        } else {
+            // Otherwise load from localStorage (for offline progress)
+            loadGameState();
+        }
+        
+        // Try to restore any in-progress game from today (after page refresh)
+        loadGameState();
     }
     
     // Display stats after loading them (with slight delay to ensure DOM is ready)
