@@ -8,7 +8,11 @@ const AUTH_CONFIG = {
     CLIENT_ID: 'Ov23lio9xRVWeE2HuJ6w', // Your GitHub OAuth App Client ID
     REDIRECT_URI: window.location.origin + '/game.html',
     SCOPE: 'gist',
-    GIST_FILENAME: 'word-wave-stats.json',
+    
+    // Central leaderboard Gist (owned by admin/PyQuar)
+    LEADERBOARD_GIST_ID: '', // TODO: Set this after creating the gist with createLeaderboardGist()
+    LEADERBOARD_OWNER: 'PyQuar', // GitHub username who owns the leaderboard
+    
     PROXY_URL: 'https://word-wave-auth-proxy.vercel.app/api/token' // Permanent Vercel production URL
 };
 
@@ -153,162 +157,180 @@ class AuthManager {
         }
     }
 
-    // Save stats to GitHub Gist
+    // Save stats to central leaderboard Gist
     async saveStats(stats, lastPlayedDate = null, gameState = null) {
-        if (!this.isAuthenticated) {
+        if (!this.isAuthenticated || !this.user) {
             console.log('Not authenticated, saving locally only');
             return false;
         }
 
         try {
-            const gistData = {
-                description: 'Word Wave Game Statistics',
-                public: false,
-                files: {
-                    [AUTH_CONFIG.GIST_FILENAME]: {
-                        content: JSON.stringify({
-                            stats: stats,
-                            lastPlayedDate: lastPlayedDate,
-                            gameState: gameState, // Save today's game board state
-                            lastUpdated: new Date().toISOString(),
-                            version: '1.1'
-                        }, null, 2)
-                    }
-                }
+            // Get current leaderboard data
+            const leaderboard = await this.loadLeaderboard();
+            
+            // Update player's data
+            const playerData = {
+                username: this.user.login,
+                avatar: this.user.avatar_url,
+                stats: stats,
+                lastPlayedDate: lastPlayedDate,
+                gameState: gameState,
+                lastUpdated: new Date().toISOString()
             };
-
-            // Check if gist already exists
-            const storedGistId = localStorage.getItem('gist_id');
             
-            let response;
-            if (storedGistId) {
-                // Update existing gist
-                response = await fetch(`https://api.github.com/gists/${storedGistId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(gistData)
-                });
-            } else {
-                // Create new gist
-                response = await fetch('https://api.github.com/gists', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(gistData)
-                });
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to save to Gist');
-            }
-
-            const gist = await response.json();
-            this.gistId = gist.id;
-            localStorage.setItem('gist_id', gist.id);
+            leaderboard.players[this.user.login] = playerData;
+            leaderboard.lastUpdated = new Date().toISOString();
             
-            console.log('Stats saved to GitHub Gist:', gist.id);
-            this.updateSyncStatus('synced');
-            return true;
+            // Save back to central Gist
+            const saved = await this.updateLeaderboard(leaderboard);
+            
+            if (saved) {
+                console.log('Stats saved to leaderboard');
+                this.updateSyncStatus('synced');
+                return true;
+            }
+            
+            return false;
         } catch (error) {
-            console.error('Error saving to Gist:', error);
+            console.error('Error saving to leaderboard:', error);
             this.updateSyncStatus('error');
             return false;
         }
     }
 
-    // Load stats from GitHub Gist
+    // Load stats from central leaderboard
     async loadStats() {
-        if (!this.isAuthenticated) {
+        if (!this.isAuthenticated || !this.user) {
             console.log('Not authenticated, loading local stats only');
             return null;
         }
 
         try {
-            // First, try to get gist ID from localStorage
-            let gistId = localStorage.getItem('gist_id');
-
-            // If no gist ID, search for existing gist
-            if (!gistId) {
-                gistId = await this.findExistingGist();
-            }
-
-            if (!gistId) {
-                console.log('No existing gist found');
-                return null;
-            }
-
-            // Fetch gist content
-            const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to load from Gist');
-            }
-
-            const gist = await response.json();
-            const fileContent = gist.files[AUTH_CONFIG.GIST_FILENAME]?.content;
-
-            if (fileContent) {
-                const data = JSON.parse(fileContent);
-                console.log('Stats loaded from GitHub Gist');
+            const leaderboard = await this.loadLeaderboard();
+            const playerData = leaderboard.players[this.user.login];
+            
+            if (playerData) {
+                console.log('Stats loaded from leaderboard');
                 this.updateSyncStatus('synced');
-                // Return stats, lastPlayedDate, and gameState
                 return {
-                    stats: data.stats,
-                    lastPlayedDate: data.lastPlayedDate || null,
-                    gameState: data.gameState || null
+                    stats: playerData.stats,
+                    lastPlayedDate: playerData.lastPlayedDate || null,
+                    gameState: playerData.gameState || null
                 };
             }
 
+            console.log('No stats found in leaderboard for this user');
             return null;
         } catch (error) {
-            console.error('Error loading from Gist:', error);
+            console.error('Error loading from leaderboard:', error);
             this.updateSyncStatus('error');
             return null;
         }
     }
 
-    // Find existing Word Wave gist
-    async findExistingGist() {
+    // Load leaderboard from central Gist
+    async loadLeaderboard() {
+        if (!AUTH_CONFIG.LEADERBOARD_GIST_ID) {
+            console.warn('Leaderboard Gist ID not configured');
+            return { players: {}, lastUpdated: null, version: '2.0' };
+        }
+
         try {
-            const response = await fetch('https://api.github.com/gists', {
+            // Leaderboard is public, so anyone can read it
+            const response = await fetch(`https://api.github.com/gists/${AUTH_CONFIG.LEADERBOARD_GIST_ID}`, {
                 headers: {
-                    'Authorization': `Bearer ${this.token}`,
                     'Accept': 'application/vnd.github.v3+json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch gists');
+                if (response.status === 404) {
+                    console.log('Leaderboard Gist not found');
+                    return { players: {}, lastUpdated: null, version: '2.0' };
+                }
+                throw new Error(`HTTP ${response.status}`);
             }
 
-            const gists = await response.json();
-            const wordWaveGist = gists.find(gist => 
-                gist.description === 'Word Wave Game Statistics' &&
-                gist.files[AUTH_CONFIG.GIST_FILENAME]
-            );
+            const gist = await response.json();
+            const fileContent = gist.files['wordwave-leaderboard.json']?.content;
 
-            if (wordWaveGist) {
-                this.gistId = wordWaveGist.id;
-                localStorage.setItem('gist_id', wordWaveGist.id);
-                return wordWaveGist.id;
+            if (fileContent) {
+                return JSON.parse(fileContent);
             }
 
-            return null;
+            return { players: {}, lastUpdated: null, version: '2.0' };
         } catch (error) {
-            console.error('Error finding existing gist:', error);
-            return null;
+            console.error('Error loading leaderboard:', error);
+            return { players: {}, lastUpdated: null, version: '2.0' };
+        }
+    }
+
+    // Update central leaderboard Gist
+    async updateLeaderboard(leaderboard) {
+        if (!this.isAuthenticated || !this.token) {
+            console.error('Not authenticated');
+            return false;
+        }
+
+        if (!AUTH_CONFIG.LEADERBOARD_GIST_ID) {
+            console.error('Leaderboard Gist ID not configured');
+            return false;
+        }
+
+        try {
+            const gistData = {
+                description: 'Word Wave - Global Leaderboard',
+                public: true, // Public so anyone can view leaderboard
+                files: {
+                    'wordwave-leaderboard.json': {
+                        content: JSON.stringify(leaderboard, null, 2)
+                    }
+                }
+            };
+
+            const response = await fetch(`https://api.github.com/gists/${AUTH_CONFIG.LEADERBOARD_GIST_ID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gistData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error updating leaderboard:', error);
+            return false;
+        }
+    }
+
+    // Get top players for leaderboard display
+    async getTopPlayers(limit = 10) {
+        try {
+            const leaderboard = await this.loadLeaderboard();
+            const players = Object.values(leaderboard.players);
+            
+            // Sort by win rate, then by games played
+            players.sort((a, b) => {
+                const winRateA = a.stats.gamesPlayed > 0 ? (a.stats.gamesWon / a.stats.gamesPlayed) : 0;
+                const winRateB = b.stats.gamesPlayed > 0 ? (b.stats.gamesWon / b.stats.gamesPlayed) : 0;
+                
+                if (winRateB !== winRateA) {
+                    return winRateB - winRateA; // Higher win rate first
+                }
+                
+                return b.stats.gamesPlayed - a.stats.gamesPlayed; // More games played as tiebreaker
+            });
+            
+            return players.slice(0, limit);
+        } catch (error) {
+            console.error('Error getting top players:', error);
+            return [];
         }
     }
 
@@ -357,5 +379,80 @@ const authManager = new AuthManager();
 
 // Export for use in game.js
 window.authManager = authManager;
+
+// Helper function to create the central leaderboard Gist (run once by admin)
+window.createLeaderboardGist = async function() {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        console.error('❌ You must be logged in as PyQuar to create the leaderboard');
+        return;
+    }
+    
+    try {
+        const gistData = {
+            description: 'Word Wave - Global Leaderboard',
+            public: true,
+            files: {
+                'wordwave-leaderboard.json': {
+                    content: JSON.stringify({
+                        players: {},
+                        lastUpdated: new Date().toISOString(),
+                        version: '2.0'
+                    }, null, 2)
+                }
+            }
+        };
+        
+        const response = await fetch('https://api.github.com/gists', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${window.authManager.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gistData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Leaderboard Gist created successfully!');
+        console.log('📋 Gist ID:', result.id);
+        console.log('🔗 URL:', result.html_url);
+        console.log('\n📝 Next steps:');
+        console.log(`1. Copy this Gist ID: ${result.id}`);
+        console.log('2. Update auth.js: AUTH_CONFIG.LEADERBOARD_GIST_ID = "' + result.id + '"');
+        console.log('3. Commit and push the change');
+        
+        return result.id;
+        
+    } catch (error) {
+        console.error('❌ Error creating leaderboard Gist:', error);
+    }
+};
+
+// Helper function to display leaderboard in console
+window.showLeaderboard = async function(limit = 10) {
+    try {
+        const players = await window.authManager.getTopPlayers(limit);
+        
+        console.log('\n🏆 === WORD WAVE LEADERBOARD === 🏆\n');
+        console.table(players.map((p, i) => ({
+            Rank: i + 1,
+            Player: p.username,
+            'Games Played': p.stats.gamesPlayed,
+            'Games Won': p.stats.gamesWon,
+            'Win Rate': p.stats.gamesPlayed > 0 ? 
+                `${Math.round((p.stats.gamesWon / p.stats.gamesPlayed) * 100)}%` : '0%',
+            'Current Streak': p.stats.currentStreak,
+            'Best Streak': p.stats.maxStreak
+        })));
+        
+        return players;
+    } catch (error) {
+        console.error('Error showing leaderboard:', error);
+    }
+};
 
 console.log('%c🔐 GitHub Auth System Loaded!', 'font-size: 16px; font-weight: bold; color: #2dd4bf;');
