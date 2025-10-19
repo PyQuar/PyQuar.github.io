@@ -510,8 +510,23 @@ function submitGuess() {
     
     gameState.guesses.push(gameState.currentGuess);
     
-    // Save state after submitting a complete word
+    // Save state locally after submitting a complete word
     saveGameState();
+    
+    // Also save to cloud if authenticated (for game in progress)
+    if (window.authManager && window.authManager.isAuthenticated) {
+        const today = getTodayString();
+        const cloudGameState = {
+            currentRow: gameState.currentRow,
+            guesses: gameState.guesses,
+            gameOver: false, // Game still in progress
+            isWin: false,
+            targetWord: gameState.targetWord,
+            date: today
+        };
+        // Save without blocking (async, no await)
+        window.authManager.saveStats(gameState.stats, gameState.lastPlayedDate, cloudGameState);
+    }
     
     checkGuess();
     
