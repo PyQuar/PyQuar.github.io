@@ -464,6 +464,9 @@ function addLetter(letter) {
         
         gameState.currentGuess += letter;
         gameState.currentTile++;
+        
+        // Save state after each letter
+        saveGameState();
     }
 }
 
@@ -476,6 +479,9 @@ function deleteLetter() {
         tile.classList.remove('filled');
         
         gameState.currentGuess = gameState.currentGuess.slice(0, -1);
+        
+        // Save state after deletion
+        saveGameState();
     }
 }
 
@@ -1002,6 +1008,8 @@ function resetStats() {
 function saveGameState() {
     const gameData = {
         currentRow: gameState.currentRow,
+        currentTile: gameState.currentTile,
+        currentGuess: gameState.currentGuess,
         guesses: gameState.guesses,
         gameOver: gameState.gameOver,
         isWin: gameState.isWin,
@@ -1020,6 +1028,8 @@ function loadGameState() {
             // Only load if it's from today
             if (gameData.date === getTodayString()) {
                 gameState.currentRow = gameData.currentRow;
+                gameState.currentTile = gameData.currentTile || 0;
+                gameState.currentGuess = gameData.currentGuess || '';
                 gameState.guesses = gameData.guesses || [];
                 gameState.gameOver = gameData.gameOver;
                 gameState.isWin = gameData.isWin;
@@ -1027,6 +1037,8 @@ function loadGameState() {
                 
                 // Recreate the board with previous guesses
                 createBoard();
+                
+                // Restore completed rows
                 gameState.guesses.forEach((guess, rowIndex) => {
                     for (let i = 0; i < WORD_LENGTH; i++) {
                         const tile = getTile(rowIndex, i);
@@ -1046,6 +1058,15 @@ function loadGameState() {
                         }
                     }
                 });
+                
+                // Restore current typing on the current row
+                if (gameState.currentGuess && !gameState.gameOver) {
+                    for (let i = 0; i < gameState.currentGuess.length; i++) {
+                        const tile = getTile(gameState.currentRow, i);
+                        tile.textContent = gameState.currentGuess[i];
+                        tile.classList.add('filled');
+                    }
+                }
             }
         } catch (error) {
             console.error('Error loading game state:', error);
