@@ -152,22 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (cloudGameState && cloudGameState.date === today && !cloudGameState.gameOver) {
             console.log('Found cloud game in progress for today, restoring...');
             gameState.currentRow = cloudGameState.currentRow || 0;
-            gameState.currentTile = cloudGameState.currentTile || 0;
-            gameState.currentGuess = cloudGameState.currentGuess || '';
             gameState.guesses = cloudGameState.guesses || [];
             gameState.targetWord = cloudGameState.targetWord || todayWord;
             
-            // Restore the board
+            // Use same restore function (only completed guesses)
             restoreBoardFromState(cloudGameState);
-            
-            // Restore current typing on the current row
-            if (gameState.currentGuess && !gameState.gameOver) {
-                for (let i = 0; i < gameState.currentGuess.length; i++) {
-                    const tile = getTile(gameState.currentRow, i);
-                    tile.textContent = gameState.currentGuess[i];
-                    tile.classList.add('filled');
-                }
-            }
         } else {
             // Otherwise load from localStorage (for offline progress)
             loadGameState();
@@ -1039,79 +1028,49 @@ function saveGameState() {
     });
     const gameData = {
         currentRow: gameState.currentRow,
-        currentTile: gameState.currentTile,
-        currentGuess: gameState.currentGuess,
-        guesses: gameState.guesses,
+        guesses: gameState.guesses, // Only save completed guesses
         gameOver: gameState.gameOver,
         isWin: gameState.isWin,
         targetWord: gameState.targetWord,
         date: getTodayString()
     };
     localStorage.setItem('wordWaveGameState', JSON.stringify(gameData));
-    console.log('Game state saved to localStorage');
+    console.log('Game state saved - guesses:', gameState.guesses.length);
 }
 
 function loadGameState() {
     const saved = localStorage.getItem('wordWaveGameState');
     console.log('Loading game state...', saved ? 'Found saved data' : 'No saved data');
-    if (saved) {
-        try {
-            const gameData = JSON.parse(saved);
-            console.log('Parsed game data:', gameData);
-            
-            // Only load if it's from today
-            if (gameData.date === getTodayString()) {
-                console.log('Loading game from today');
-                gameState.currentRow = gameData.currentRow;
-                gameState.currentTile = gameData.currentTile || 0;
-                gameState.currentGuess = gameData.currentGuess || '';
-                gameState.guesses = gameData.guesses || [];
-                gameState.gameOver = gameData.gameOver;
-                gameState.isWin = gameData.isWin;
-                gameState.targetWord = gameData.targetWord;
-                
-                // NOTE: createBoard() should be called BEFORE this function
-                // DO NOT call createBoard() here to avoid clearing the board
-                
-                // Restore completed rows
-                gameState.guesses.forEach((guess, rowIndex) => {
-                    for (let i = 0; i < WORD_LENGTH; i++) {
-                        const tile = getTile(rowIndex, i);
-                        if (tile) {
-                            tile.textContent = guess[i];
-                            tile.classList.add('filled');
-                            
-                            // Apply colors
-                            if (guess[i] === gameState.targetWord[i]) {
-                                tile.classList.add('correct');
-                                updateKeyboard(guess[i], 'correct');
-                            } else if (gameState.targetWord.includes(guess[i])) {
-                                tile.classList.add('present');
-                                updateKeyboard(guess[i], 'present');
-                            } else {
-                                tile.classList.add('absent');
-                                updateKeyboard(guess[i], 'absent');
-                            }
-                        }
-                    }
-                });
-                
-                // Restore current typing on the current row
-                console.log('Restoring current guess:', gameState.currentGuess);
-                if (gameState.currentGuess && !gameState.gameOver) {
-                    for (let i = 0; i < gameState.currentGuess.length; i++) {
-                        const tile = getTile(gameState.currentRow, i);
-                        if (tile) {
-                            tile.textContent = gameState.currentGuess[i];
-                            tile.classList.add('filled');
-                            console.log(`Restored letter ${gameState.currentGuess[i]} at position ${i}`);
-                        }
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error loading game state:', error);
+    if (!saved) return;
+    
+    try {
+        const gameData = JSON.parse(saved);
+        console.log('Parsed game data:', gameData);
+        
+        // Only load if it's from today
+        if (gameData.date !== getTodayString()) {
+            console.log('Game data is from a different day, ignoring');
+            return;
         }
+        
+        console.log('Loading game from today');
+        
+        // Restore game state variables
+        gameState.currentRow = gameData.currentRow || 0;
+        gameState.guesses = gameData.guesses || [];
+        gameState.gameOver = gameData.gameOver || false;
+        gameState.isWin = gameData.isWin || false;
+        gameState.targetWord = gameData.targetWord;
+        
+        // Use the SAME function as when game ends - restoreBoardFromState
+        // This handles completed guesses (no partial typing restoration)
+        if (gameData.guesses && gameData.guesses.length > 0) {
+            restoreBoardFromState(gameData);
+        }
+        
+        console.log('Game state loaded -', gameState.guesses.length, 'completed guesses');
+    } catch (error) {
+        console.error('Error loading game state:', error);
     }
 }
 
