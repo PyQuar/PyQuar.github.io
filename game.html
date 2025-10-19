@@ -67,7 +67,6 @@
                             <h1>Word Wave</h1>
                         </div>
                     </a>
-                    <p class="game-tagline">Guess the press & science word!</p>
                     
                     <!-- Action buttons horizontal below title -->
                     <div class="game-actions">
@@ -278,14 +277,28 @@
 
         function renderFromData(leaderboard, n) {
             const players = Object.values(leaderboard.players || {});
-            // Sort: wins desc, total attempts asc
+            
+            // Helper to compute wins robustly
+            function computeWins(stats) {
+                if (!stats) return 0;
+                // Check gamesWon first (what the game actually saves)
+                if (typeof stats.gamesWon === 'number') return stats.gamesWon;
+                if (typeof stats.wins === 'number') return stats.wins;
+                // Fallback: sum of guessDistribution
+                if (Array.isArray(stats.guessDistribution)) {
+                    return stats.guessDistribution.reduce((s, v) => s + (Number(v) || 0), 0);
+                }
+                return 0;
+            }
+            
+            // Sort: wins desc (more wins = better), total attempts asc (fewer attempts = better for tiebreak)
             players.sort((a, b) => {
-                const aw = (a.stats && a.stats.wins) || 0;
-                const bw = (b.stats && b.stats.wins) || 0;
-                if (aw !== bw) return bw - aw;
+                const aw = computeWins(a.stats);
+                const bw = computeWins(b.stats);
+                if (aw !== bw) return bw - aw; // Higher wins first
                 const at = calculateTotalAttempts(a.stats) || 0;
                 const bt = calculateTotalAttempts(b.stats) || 0;
-                return at - bt;
+                return at - bt; // Lower attempts first (for same wins)
             });
 
             const top = players.slice(0, n);
@@ -293,18 +306,6 @@
             if (top.length === 0) {
                 listEl.innerHTML = '<p class="muted">No players yet.</p>';
                 return;
-            }
-
-            // Helper to compute wins robustly: prefer explicit fields, fallback to guessDistribution sum
-            function computeWins(stats) {
-                if (!stats) return 0;
-                // Common fields used across code: gamesWon or wins
-                if (typeof stats.gamesWon === 'number') return stats.gamesWon;
-                if (typeof stats.wins === 'number') return stats.wins;
-                if (Array.isArray(stats.guessDistribution)) {
-                    return stats.guessDistribution.reduce((s, v) => s + (Number(v) || 0), 0);
-                }
-                return 0;
             }
 
             const rows = top.map((p, i) => {
