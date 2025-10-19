@@ -1022,12 +1022,6 @@ function resetStats() {
 
 // Save/Load game state (for daily play restriction)
 function saveGameState() {
-    console.log('Saving game state...', {
-        currentRow: gameState.currentRow,
-        currentTile: gameState.currentTile,
-        currentGuess: gameState.currentGuess,
-        guessesCount: gameState.guesses.length
-    });
     const gameData = {
         currentRow: gameState.currentRow,
         guesses: gameState.guesses, // Only save completed guesses
@@ -1036,8 +1030,10 @@ function saveGameState() {
         targetWord: gameState.targetWord,
         date: getTodayString()
     };
+    
+    console.log('Saving game state...', gameData);
     localStorage.setItem('wordWaveGameState', JSON.stringify(gameData));
-    console.log('Game state saved - guesses:', gameState.guesses.length);
+    console.log('Game state saved - guesses:', gameState.guesses.length, 'words:', gameState.guesses);
 }
 
 function loadGameState() {
