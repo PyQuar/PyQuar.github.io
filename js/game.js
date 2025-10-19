@@ -172,9 +172,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Otherwise load from localStorage (for offline progress)
             loadGameState();
         }
-        
-        // Try to restore any in-progress game from today (after page refresh)
-        loadGameState();
     }
     
     // Display stats after loading them (with slight delay to ensure DOM is ready)
