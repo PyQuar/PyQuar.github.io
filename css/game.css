@@ -10,24 +10,43 @@
 
 /* Game Header */
 .game-header {
-    padding: 30px 20px;
+    padding: 20px 20px 30px 20px;
     border-bottom: 2px solid rgba(45, 212, 191, 0.2);
 }
 
 .game-header-content {
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
+}
+
+/* Header Rows */
+.header-top-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.header-middle-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-bottom-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 /* Auth Section */
 .auth-section {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
 }
@@ -143,6 +162,7 @@
     display: flex;
     align-items: center;
     gap: 15px;
+    justify-content: center;
 }
 
 .game-logo i {
@@ -165,18 +185,16 @@
 }
 
 .game-tagline {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     color: #e0e0e0;
-    font-size: 0.9rem;
-    margin-top: 50px;
+    font-size: 0.95rem;
     text-align: center;
+    margin: 0;
 }
 
 .game-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    justify-content: center;
 }
 
 .icon-btn {

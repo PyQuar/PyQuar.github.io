@@ -41,45 +41,55 @@
         <!-- Game Header -->
         <header class="game-header">
             <div class="game-header-content">
-                <!-- Auth Section -->
-                <div class="auth-section">
-                    <button id="loginBtn" class="login-btn">
-                        <i class="fab fa-github"></i> Login with GitHub
-                    </button>
-                    <div id="userProfile" class="user-profile" style="display: none;">
-                        <img id="userAvatar" src="" alt="User" class="user-avatar">
-                        <span id="userName" class="user-name"></span>
-                        <button id="logoutBtn" class="logout-btn" title="Logout">
-                            <i class="fas fa-sign-out-alt"></i>
+                <!-- Top Row: Auth Section -->
+                <div class="header-top-row">
+                    <div class="auth-section">
+                        <button id="loginBtn" class="login-btn">
+                            <i class="fab fa-github"></i> Login with GitHub
+                        </button>
+                        <div id="userProfile" class="user-profile" style="display: none;">
+                            <img id="userAvatar" src="" alt="User" class="user-avatar">
+                            <span id="userName" class="user-name"></span>
+                            <button id="logoutBtn" class="logout-btn" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                        <span id="syncStatus" class="sync-status">
+                            <i class="fas fa-cloud-slash"></i> Not synced
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Middle Row: Logo and Tagline -->
+                <div class="header-middle-row">
+                    <a href="index.html" class="game-logo-link">
+                        <div class="game-logo">
+                            <i class="fas fa-wave-square"></i>
+                            <h1>Word Wave</h1>
+                        </div>
+                    </a>
+                    <p class="game-tagline">Guess the press & science word!</p>
+                </div>
+                
+                <!-- Bottom Row: Action Buttons -->
+                <div class="header-bottom-row">
+                    <div class="game-actions">
+                        <button class="icon-btn" id="helpBtn" title="How to Play">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        <button class="icon-btn" id="leaderboardBtn" title="Leaderboard">
+                            <i class="fas fa-trophy"></i>
+                        </button>
+                        <button class="icon-btn" id="statsBtn" title="Statistics">
+                            <i class="fas fa-chart-bar"></i>
+                        </button>
+                        <button class="icon-btn" id="settingsBtn" title="Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="icon-btn" id="devBtn" title="Developer Tools" style="display: none;">
+                            <i class="fas fa-code"></i>
                         </button>
                     </div>
-                    <span id="syncStatus" class="sync-status">
-                        <i class="fas fa-cloud-slash"></i> Not synced
-                    </span>
-                </div>
-                <a href="index.html" class="game-logo-link">
-                    <div class="game-logo">
-                        <i class="fas fa-wave-square"></i>
-                        <h1>Word Wave</h1>
-                    </div>
-                </a>
-                <p class="game-tagline">Guess the press & science word!</p>
-                <div class="game-actions">
-                    <button class="icon-btn" id="helpBtn" title="How to Play">
-                        <i class="fas fa-question-circle"></i>
-                    </button>
-                    <button class="icon-btn" id="leaderboardBtn" title="Leaderboard">
-                        <i class="fas fa-trophy"></i>
-                    </button>
-                    <button class="icon-btn" id="statsBtn" title="Statistics">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                    <button class="icon-btn" id="settingsBtn" title="Settings">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <button class="icon-btn" id="devBtn" title="Developer Tools" style="display: none;">
-                        <i class="fas fa-code"></i>
-                    </button>
                 </div>
             </div>
         </header>
