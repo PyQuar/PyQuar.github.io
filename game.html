@@ -68,6 +68,9 @@
                     <button class="icon-btn" id="helpBtn" title="How to Play">
                         <i class="fas fa-question-circle"></i>
                     </button>
+                    <button class="icon-btn" id="leaderboardBtn" title="Leaderboard">
+                        <i class="fas fa-trophy"></i>
+                    </button>
                     <button class="icon-btn" id="statsBtn" title="Statistics">
                         <i class="fas fa-chart-bar"></i>
                     </button>
@@ -146,6 +149,31 @@
         </div>
     </div>
 
+    <!-- Leaderboard Modal -->
+    <div class="modal" id="leaderboardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-trophy"></i> Global Leaderboard</h2>
+                <button class="modal-close" data-modal="leaderboardModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-list" id="leaderboardList">
+                    <p class="muted">Loading top players…</p>
+                </div>
+                <div class="leaderboard-footer" style="text-align: center; margin-top: 1rem; color: #666;">
+                    <small><i class="fas fa-info-circle"></i> Ranked by wins (tie break: fewer total attempts)</small>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button id="refreshLeaderboardBtn" class="btn" style="padding: 0.5rem 2rem;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Help Modal -->
     <div class="modal" id="helpModal">
         <div class="modal-content">
@@ -202,6 +230,100 @@
             </div>
         </div>
     </div>
+
+    <!-- Leaderboard Script -->
+    <script>
+        // Render top N players into the leaderboardList element
+        async function renderLeaderboardTop(n = 10) {
+            const listEl = document.getElementById('leaderboardList');
+            listEl.innerHTML = '<p class="muted">Loading top players…</p>';
+
+            // Try to use the global authManager if available
+            try {
+                if (window.authManager && typeof window.authManager.loadLeaderboard === 'function') {
+                    const leaderboard = await window.authManager.loadLeaderboard();
+                    renderFromData(leaderboard, n);
+                    return;
+                }
+            } catch (e) {
+                console.warn('AuthManager loadLeaderboard failed, falling back to public fetch', e);
+            }
+
+            // Fallback: read public gist directly (read-only)
+            try {
+                const gistId = '2acc97044fc86cb79c96b02a5bd1b5fb';
+                const resp = await fetch(`https://api.github.com/gists/${gistId}`, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const gist = await resp.json();
+                const content = gist.files && gist.files['wordwave-leaderboard.json'] && gist.files['wordwave-leaderboard.json'].content;
+                const leaderboard = content ? JSON.parse(content) : { players: {} };
+                renderFromData(leaderboard, n);
+            } catch (err) {
+                console.error('Error loading public leaderboard:', err);
+                const list = document.getElementById('leaderboardList');
+                list.innerHTML = '<p class="muted">Unable to load leaderboard.</p>';
+            }
+        }
+
+        function renderFromData(leaderboard, n) {
+            const players = Object.values(leaderboard.players || {});
+            // Sort: wins desc, total attempts asc
+            players.sort((a, b) => {
+                const aw = (a.stats && a.stats.wins) || 0;
+                const bw = (b.stats && b.stats.wins) || 0;
+                if (aw !== bw) return bw - aw;
+                const at = calculateTotalAttempts(a.stats) || 0;
+                const bt = calculateTotalAttempts(b.stats) || 0;
+                return at - bt;
+            });
+
+            const top = players.slice(0, n);
+            const listEl = document.getElementById('leaderboardList');
+            if (top.length === 0) {
+                listEl.innerHTML = '<p class="muted">No players yet.</p>';
+                return;
+            }
+
+            const rows = top.map((p, i) => {
+                const name = p.username || p.stats?.username || 'anon';
+                const wins = (p.stats && p.stats.wins) || 0;
+                const attempts = calculateTotalAttempts(p.stats) || 0;
+                const avatar = p.avatar || '';
+                return `
+                    <div class="leaderboard-row">
+                        <div class="rank">${i+1}</div>
+                        <div class="avatar"><img src="${avatar || 'assets/clublogo.png'}" alt="${name}"></div>
+                        <div class="player-info">
+                            <div class="player-name">${escapeHtml(name)}</div>
+                            <div class="player-meta">${wins} wins • ${attempts} attempts</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.innerHTML = rows;
+        }
+
+        function calculateTotalAttempts(stats) {
+            if (!stats || !stats.guessDistribution) return 0;
+            // assume guessDistribution is an array where index = guesses-1, value = count
+            try {
+                return stats.guessDistribution.reduce((sum, count, idx) => sum + (count * (idx+1)), 0);
+            } catch (e) { return 0; }
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.replace(/[&<>"'`]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;",'`':'&#96;'})[c]);
+        }
+
+        document.getElementById('refreshLeaderboardBtn').addEventListener('click', () => renderLeaderboardTop(10));
+
+        // Load leaderboard when modal opens
+        document.getElementById('leaderboardBtn').addEventListener('click', () => {
+            renderLeaderboardTop(10);
+        });
+    </script>
 
     <!-- Statistics Modal -->
     <div class="modal" id="statsModal">

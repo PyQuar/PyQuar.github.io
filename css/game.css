@@ -298,6 +298,51 @@
 }
 
 /* Keyboard */
+
+/* Leaderboard Styles */
+.leaderboard-list { 
+    gap: 8px; 
+    display: flex; 
+    flex-direction: column;
+    max-height: 500px;
+    overflow-y: auto;
+}
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.leaderboard-row:hover { 
+    background: rgba(45,212,191,0.08);
+    border-color: rgba(45,212,191,0.2);
+}
+.leaderboard-row .rank { 
+    width: 32px; 
+    font-weight: 700; 
+    color: #2dd4bf;
+    font-size: 1.1rem;
+}
+.leaderboard-row .avatar img { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    border: 2px solid rgba(45,212,191,0.3);
+}
+.leaderboard-row .player-name { 
+    font-weight: 700; 
+    color: #ffffff;
+    font-size: 1rem;
+}
+.leaderboard-row .player-meta { 
+    font-size: 0.9rem; 
+    color: #9ca3af;
+}
+
 .keyboard {
     max-width: 500px;
     width: 100%;
