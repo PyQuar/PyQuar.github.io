@@ -549,14 +549,34 @@
                 </div>
 
                 <div class="dev-section">
-                    <h3>Force Word</h3>
-                    <p>Select a specific word for testing:</p>
+                    <h3>Force Word (Local Testing)</h3>
+                    <p>Select a specific word for testing (local only):</p>
                     <select id="devWord" class="dev-input">
                         <option value="">-- Current Daily Word --</option>
                     </select>
                     <button class="btn btn-primary" id="setWordBtn">
-                        <i class="fas fa-edit"></i> Set Word
+                        <i class="fas fa-edit"></i> Set Word (Local)
                     </button>
+                </div>
+
+                <div class="dev-section">
+                    <h3>📅 Global Date Override (All Players)</h3>
+                    <p><strong>⚠️ Warning:</strong> This sets the word for ALL players on this date!</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="date" id="overrideDate" class="dev-input" style="flex: 1;">
+                        <select id="overrideWord" class="dev-input" style="flex: 1;">
+                            <option value="">Select word...</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" id="setOverrideBtn" style="flex: 1;">
+                            <i class="fas fa-globe"></i> Set Global Override
+                        </button>
+                        <button class="btn btn-secondary" id="viewOverridesBtn" style="flex: 1;">
+                            <i class="fas fa-list"></i> View Overrides
+                        </button>
+                    </div>
+                    <div id="overridesList" style="margin-top: 10px; max-height: 150px; overflow-y: auto;"></div>
                 </div>
 
                 <div class="dev-section">

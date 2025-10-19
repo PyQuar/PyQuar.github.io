@@ -488,6 +488,10 @@ function setupEventListeners() {
     document.getElementById('nextDayBtn')?.addEventListener('click', skipToTomorrow);
     document.getElementById('resetDayBtn')?.addEventListener('click', resetToToday);
     
+    // Date override tools
+    document.getElementById('setOverrideBtn')?.addEventListener('click', setOverrideFromUI);
+    document.getElementById('viewOverridesBtn')?.addEventListener('click', loadOverridesList);
+    
     // Auth event listeners
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -1215,6 +1219,8 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
 // Populate word dropdown
 function populateWordDropdown() {
     const devWordSelect = document.getElementById('devWord');
+    const overrideWordSelect = document.getElementById('overrideWord');
+    
     if (devWordSelect) {
         // Clear existing options
         devWordSelect.innerHTML = '<option value="">Select a word...</option>';
@@ -1226,7 +1232,19 @@ function populateWordDropdown() {
             option.textContent = word;
             devWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated dropdown with ${WORD_LIST.length} words`);
+    }
+    
+    if (overrideWordSelect) {
+        // Clear existing options
+        overrideWordSelect.innerHTML = '<option value="">Select word...</option>';
+        
+        // Add all words from the list
+        WORD_LIST.forEach(word => {
+            const option = document.createElement('option');
+            option.value = word;
+            option.textContent = word;
+            overrideWordSelect.appendChild(option);
+        });
     }
 }
 
@@ -1249,9 +1267,116 @@ if (devModal) {
         originalOpenModal(modalId);
         if (modalId === 'devModal') {
             updateDevInfo();
+            loadOverridesList();
         }
     };
 }
+
+// Load and display date overrides
+async function loadOverridesList() {
+    const overridesList = document.getElementById('overridesList');
+    if (!overridesList) return;
+    
+    try {
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            }
+        );
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const gist = await response.json();
+        const fileContent = gist.files['wordwave-words.json']?.content;
+        const wordData = fileContent ? JSON.parse(fileContent) : {};
+        
+        if (wordData.dateOverrides && Object.keys(wordData.dateOverrides).length > 0) {
+            overridesList.innerHTML = '';
+            
+            // Sort by date
+            const sortedDates = Object.keys(wordData.dateOverrides).sort();
+            
+            sortedDates.forEach(date => {
+                const word = wordData.dateOverrides[date];
+                const item = document.createElement('div');
+                item.className = 'override-item';
+                item.innerHTML = `
+                    <span class="override-date">${date}</span>
+                    <span class="override-word">${word}</span>
+                    <button class="override-remove" onclick="removeOverride('${date}')">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                `;
+                overridesList.appendChild(item);
+            });
+        } else {
+            overridesList.innerHTML = '<p style="color: #888; text-align: center; padding: 10px;">No date overrides configured</p>';
+        }
+    } catch (error) {
+        console.error('Error loading overrides:', error);
+        overridesList.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 10px;">Error loading overrides</p>';
+    }
+}
+
+// Set date override from UI
+async function setOverrideFromUI() {
+    const dateInput = document.getElementById('overrideDate');
+    const wordSelect = document.getElementById('overrideWord');
+    
+    if (!dateInput.value || !wordSelect.value) {
+        showMessage('Please select both date and word', true);
+        return;
+    }
+    
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        showMessage('You must be logged in as admin', true);
+        return;
+    }
+    
+    const confirmed = confirm(`Set word "${wordSelect.value}" for ALL players on ${dateInput.value}?`);
+    if (!confirmed) return;
+    
+    showMessage('Setting override...', false);
+    
+    try {
+        await window.setWordForDate(dateInput.value, wordSelect.value);
+        showMessage('Override set successfully!', false);
+        dateInput.value = '';
+        wordSelect.value = '';
+        setTimeout(() => loadOverridesList(), 1000);
+    } catch (error) {
+        showMessage('Failed to set override', true);
+        console.error(error);
+    }
+}
+
+// Remove override from UI
+async function removeOverride(date) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        showMessage('You must be logged in as admin', true);
+        return;
+    }
+    
+    const confirmed = confirm(`Remove override for ${date}?`);
+    if (!confirmed) return;
+    
+    showMessage('Removing override...', false);
+    
+    try {
+        await window.removeDateOverride(date);
+        showMessage('Override removed successfully!', false);
+        setTimeout(() => loadOverridesList(), 1000);
+    } catch (error) {
+        showMessage('Failed to remove override', true);
+        console.error(error);
+    }
+}
+
+// Make removeOverride global for onclick
+window.removeOverride = removeOverride;
 
 // Set custom date
 function setDevDate() {
