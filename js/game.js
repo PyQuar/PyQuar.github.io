@@ -155,6 +155,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             gameState.guesses = cloudGameState.guesses || [];
             gameState.targetWord = cloudGameState.targetWord || todayWord;
             
+            // Reset typing position (no partial input restoration)
+            gameState.currentTile = 0;
+            gameState.currentGuess = '';
+            
             // Use same restore function (only completed guesses)
             restoreBoardFromState(cloudGameState);
         } else {
@@ -1061,6 +1065,10 @@ function loadGameState() {
         gameState.gameOver = gameData.gameOver || false;
         gameState.isWin = gameData.isWin || false;
         gameState.targetWord = gameData.targetWord;
+        
+        // Reset typing position (no partial input restoration)
+        gameState.currentTile = 0;
+        gameState.currentGuess = '';
         
         // Use the SAME function as when game ends - restoreBoardFromState
         // This handles completed guesses (no partial typing restoration)
