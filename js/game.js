@@ -1006,6 +1006,12 @@ function resetStats() {
 
 // Save/Load game state (for daily play restriction)
 function saveGameState() {
+    console.log('Saving game state...', {
+        currentRow: gameState.currentRow,
+        currentTile: gameState.currentTile,
+        currentGuess: gameState.currentGuess,
+        guessesCount: gameState.guesses.length
+    });
     const gameData = {
         currentRow: gameState.currentRow,
         currentTile: gameState.currentTile,
@@ -1017,16 +1023,20 @@ function saveGameState() {
         date: getTodayString()
     };
     localStorage.setItem('wordWaveGameState', JSON.stringify(gameData));
+    console.log('Game state saved to localStorage');
 }
 
 function loadGameState() {
     const saved = localStorage.getItem('wordWaveGameState');
+    console.log('Loading game state...', saved ? 'Found saved data' : 'No saved data');
     if (saved) {
         try {
             const gameData = JSON.parse(saved);
+            console.log('Parsed game data:', gameData);
             
             // Only load if it's from today
             if (gameData.date === getTodayString()) {
+                console.log('Loading game from today');
                 gameState.currentRow = gameData.currentRow;
                 gameState.currentTile = gameData.currentTile || 0;
                 gameState.currentGuess = gameData.currentGuess || '';
