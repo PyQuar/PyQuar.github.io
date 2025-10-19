@@ -482,9 +482,6 @@ function addLetter(letter) {
         
         gameState.currentGuess += letter;
         gameState.currentTile++;
-        
-        // Save state after each letter
-        saveGameState();
     }
 }
 
@@ -497,9 +494,6 @@ function deleteLetter() {
         tile.classList.remove('filled');
         
         gameState.currentGuess = gameState.currentGuess.slice(0, -1);
-        
-        // Save state after deletion
-        saveGameState();
     }
 }
 
@@ -515,6 +509,10 @@ function submitGuess() {
     // In a full version, you'd check against a dictionary
     
     gameState.guesses.push(gameState.currentGuess);
+    
+    // Save state after submitting a complete word
+    saveGameState();
+    
     checkGuess();
     
     if (gameState.currentGuess === gameState.targetWord) {
