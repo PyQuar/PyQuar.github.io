@@ -10,82 +10,85 @@
 
 /* Game Header */
 .game-header {
-    padding: 20px 20px 30px 20px;
+    padding: 10px 10px 12px 10px;
     border-bottom: 2px solid rgba(45, 212, 191, 0.2);
 }
 
 .game-header-content {
-    max-width: 700px;
+    max-width: 1000px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
 }
 
-/* Header Rows */
-.header-top-row {
+/* Header Top - Auth in top-right */
+.header-top {
     display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.header-middle-row {
-    display: flex;
-    flex-direction: column;
+    justify-content: flex-end;
     align-items: center;
     gap: 10px;
 }
 
-.header-bottom-row {
+/* Header Main - Title and buttons centered */
+.header-main {
     display: flex;
-    justify-content: center;
-    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-placeholder {
+    display: none;
 }
 
 /* Auth Section */
 .auth-section {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .login-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #24292e, #2d333b);
-    color: white;
-    border: 2px solid rgba(45, 212, 191, 0.3);
-    border-radius: 25px;
-    font-size: 0.95rem;
+    padding: 8px 16px;
+    background: rgba(45, 212, 191, 0.1);
+    color: #2dd4bf;
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.login-btn i {
+    font-size: 1rem;
 }
 
 .login-btn:hover {
-    background: linear-gradient(135deg, #2d333b, #373e47);
+    background: rgba(45, 212, 191, 0.2);
     border-color: #2dd4bf;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(45, 212, 191, 0.3);
+    box-shadow: 0 2px 8px rgba(45, 212, 191, 0.3);
 }
 
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 15px 8px 8px;
+    gap: 8px;
+    padding: 4px 12px 4px 4px;
     background: rgba(45, 212, 191, 0.1);
-    border: 2px solid rgba(45, 212, 191, 0.3);
-    border-radius: 25px;
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    border-radius: 20px;
 }
 
 .user-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 2px solid #2dd4bf;
 }
@@ -93,39 +96,43 @@
 .user-name {
     color: #2dd4bf;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .logout-btn {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     background: rgba(239, 68, 68, 0.2);
     border: 1px solid rgba(239, 68, 68, 0.5);
     border-radius: 50%;
     color: #ef4444;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 0.8rem;
 }
 
 .logout-btn:hover {
     background: #ef4444;
     color: white;
-    transform: scale(1.1);
 }
 
 .sync-status {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 4px;
+    padding: 3px 8px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    font-size: 0.85rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
     color: #9ca3af;
+}
+
+.sync-status i {
+    font-size: 0.75rem;
 }
 
 .sync-status.synced {
@@ -161,12 +168,12 @@
 .game-logo {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
 }
 
 .game-logo i {
-    font-size: 2.5rem;
+    font-size: 1.6rem;
     background: linear-gradient(135deg, #20a39e, #2dd4bf);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -186,27 +193,28 @@
 
 .game-tagline {
     color: #e0e0e0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     text-align: center;
     margin: 0;
 }
 
 .game-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .icon-btn {
-    width: 45px;
-    height: 45px;
+    width: 42px;
+    height: 42px;
     background: linear-gradient(135deg, rgba(29, 78, 216, 0.15), rgba(32, 163, 158, 0.15));
-    border: 2px solid rgba(45, 212, 191, 0.3);
-    border-radius: 50%;
+    border: 1.5px solid rgba(45, 212, 191, 0.3);
+    border-radius: 8px;
     color: #2dd4bf;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,7 +224,8 @@
     background: linear-gradient(135deg, #20a39e, #2dd4bf);
     border-color: #2dd4bf;
     color: white;
-    transform: scale(1.1);
+    transform: scale(1.08);
+    box-shadow: 0 3px 12px rgba(45, 212, 191, 0.4);
 }
 
 /* Game Main */
@@ -226,8 +235,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
-    gap: 30px;
+    padding: 20px 15px;
+    gap: 20px;
 }
 
 /* Game Board */
@@ -235,8 +244,8 @@
     display: grid;
     grid-template-rows: repeat(6, 1fr);
     gap: 5px;
-    padding: 10px;
-    margin-bottom: 20px;
+    padding: 8px;
+    margin-bottom: 16px;
 }
 
 .board-row {
@@ -246,14 +255,14 @@
 }
 
 .tile {
-    width: 62px;
-    height: 62px;
+    width: 56px;
+    height: 56px;
     border: 2px solid rgba(45, 212, 191, 0.3);
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.7rem;
     font-weight: 700;
     color: white;
     text-transform: uppercase;
@@ -297,13 +306,15 @@
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
-
-@keyframes flip {
-    0% { transform: rotateX(0); }
-    50% { transform: rotateX(90deg); }
-    100% { transform: rotateX(0); }
+.game-header-content {
+    max-width: 1100px; /* wider to allow left controls and centered title */
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 560px 1fr; /* left (controls), center (title), right (spacer) */
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
 }
-
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -362,11 +373,11 @@
 }
 
 .keyboard {
-    max-width: 500px;
+    max-width: 480px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .keyboard-row {
@@ -376,14 +387,14 @@
 }
 
 .key {
-    min-width: 43px;
-    height: 58px;
+    min-width: 44px;
+    height: 56px;
     padding: 0 12px;
     background: linear-gradient(135deg, rgba(29, 78, 216, 0.15), rgba(32, 163, 158, 0.15));
     border: 2px solid rgba(45, 212, 191, 0.3);
     border-radius: 8px;
     color: white;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -424,12 +435,25 @@
 }
 
 /* Message Container */
+.auth-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
 .message-container {
     position: fixed;
     top: 120px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
+}
+.game-logo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    justify-content: center;
 }
 
 .message {
@@ -440,6 +464,16 @@
     font-weight: 600;
     box-shadow: 0 10px 30px rgba(45, 212, 191, 0.4);
     animation: slideDown 0.3s ease-out;
+}
+.game-logo h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #20a39e, #2dd4bf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .message.error {
@@ -460,23 +494,23 @@
 /* Game Info */
 .game-info {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
     border-top: 2px solid rgba(45, 212, 191, 0.2);
 }
 
 .info-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     color: #e0e0e0;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .info-item i {
     color: #2dd4bf;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 /* Modal Styles */
@@ -988,14 +1022,41 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .game-header-content {
-        flex-direction: column;
         gap: 15px;
     }
 
-    .game-tagline {
-        position: static;
-        transform: none;
-        margin-top: 10px;
+    .header-top {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .auth-section {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .login-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .game-logo h1 {
+        font-size: 1.8rem;
+    }
+
+    .game-logo i {
+        font-size: 2rem;
+    }
+
+    .game-actions {
+        gap: 10px;
+    }
+
+    .icon-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
     }
 
     .tile {
