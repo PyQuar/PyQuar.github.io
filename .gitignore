@@ -48,3 +48,6 @@ ENV/
 # Personal notes (if any)
 notes.txt
 TODO.txt
+
+# Prevent nested OneDrive folders
+OneDrive/
