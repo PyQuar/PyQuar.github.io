@@ -10,37 +10,36 @@ website/
 ├── 📄 game.html            # Word Wave game page
 ├── 📄 papers.html          # Scientific papers page
 ├── 📄 README.md            # Project readme
+├── 📄 STRUCTURE.md         # This file - project structure
 ├── 📄 CNAME                # Custom domain configuration
 ├── 📄 .gitignore           # Git ignore rules
 │
 ├── 📂 css/                 # All stylesheets
 │   ├── main.css            # Main/shared styles for all pages
 │   ├── game.css            # Word Wave game styles
-│   ├── papers.css          # Papers page styles
-│   └── styles.css          # Additional styles
+│   └── papers.css          # Papers page styles
 │
 ├── 📂 js/                  # All JavaScript files
 │   ├── main.js             # Main/shared JavaScript for navigation
 │   ├── game.js             # Word Wave game logic
 │   ├── auth.js             # GitHub OAuth authentication
-│   ├── papers.js           # Papers page functionality
-│   └── script.js           # Additional scripts
+│   └── papers.js           # Papers page functionality
 │
 ├── 📂 assets/              # Images and media files
 │   └── clublogo.png        # Wavy Essai club logo
 │
 ├── 📂 docs/                # Documentation files
 │   ├── AUTH_README.md      # Authentication documentation
-│   ├── DEBUG_LOGIN.md      # Login debugging guide
-│   ├── FIX_AUTH_NOW.md     # Authentication fixes
 │   ├── GITHUB_AUTH_SETUP.md    # GitHub OAuth setup guide
-│   ├── IMPLEMENTATION_SUMMARY.md   # Implementation details
 │   ├── QUICK_START.md      # Quick start guide
 │   └── WORD_LIST_SETUP.md  # Word list configuration guide
 │
 └── 📂 vercel-proxy/        # Vercel serverless proxy for OAuth
-    └── api/
-        └── token.js        # Token exchange endpoint
+    ├── api/
+    │   └── token.js        # Token exchange endpoint
+    ├── package.json        # Dependencies
+    ├── vercel.json         # Vercel configuration
+    └── README.md           # Proxy documentation
 ```
 
 ## 🔗 File Paths
