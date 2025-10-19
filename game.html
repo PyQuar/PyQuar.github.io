@@ -12,6 +12,7 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
+        <div class="nav-container">
             <a href="index.html" class="nav-logo-link">
                 <div class="nav-logo">
                     <img src="assets/clublogo.png" alt="Wavy Essai Logo">
@@ -24,6 +25,7 @@
                 <li><a href="index.html#members" class="nav-link">Members</a></li>
                 <li><a href="papers.html" class="nav-link">Papers</a></li>
                 <li><a href="game.html" class="nav-link active">Game</a></li>
+                <li><a href="index.html#events" class="nav-link">Events</a></li>
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="hamburger">
@@ -211,30 +213,64 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="stats-summary">
-                    <div class="summary-row">
-                        <span class="summary-label">Games Played:</span>
-                        <span class="summary-value" id="gamesPlayed">0</span>
+                <!-- Stats Cards Grid -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="gamesPlayed">0</div>
+                            <div class="stat-label">Played</div>
+                        </div>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Games Won:</span>
-                        <span class="summary-value" id="gamesWon">0</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="gamesWon">0</div>
+                            <div class="stat-label">Won</div>
+                        </div>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Win Rate:</span>
-                        <span class="summary-value" id="winPercentage">0%</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="winPercentage">0%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Current Streak:</span>
-                        <span class="summary-value" id="currentStreak">0</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="currentStreak">0</div>
+                            <div class="stat-label">Current Streak</div>
+                        </div>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Best Streak:</span>
-                        <span class="summary-value" id="maxStreak">0</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="maxStreak">0</div>
+                            <div class="stat-label">Best Streak</div>
+                        </div>
                     </div>
                 </div>
 
-                <h3>Guess Distribution</h3>
+                <div class="stats-divider"></div>
+
+                <h3 class="stats-section-title">
+                    <i class="fas fa-chart-bar"></i> Guess Distribution
+                </h3>
                 <div class="distribution" id="distribution">
                     <!-- Will be populated by JavaScript -->
                 </div>
