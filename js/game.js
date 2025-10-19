@@ -1218,11 +1218,16 @@ function resetToToday() {
     setTimeout(() => location.reload(), 500);
 }
 
-// Show/hide dev button based on authentication
+// Show/hide dev button based on authentication - only for admins
 function updateDevButtonVisibility() {
     const devBtn = document.getElementById('devBtn');
     if (devBtn && window.authManager) {
-        devBtn.style.display = window.authManager.isAuthenticated ? 'flex' : 'none';
+        // Only show dev tools for specific admin users
+        const adminUsers = ['PyQuar']; // Add your GitHub usernames here
+        const isAdmin = window.authManager.isAuthenticated && 
+                       window.authManager.user && 
+                       adminUsers.includes(window.authManager.user.login);
+        devBtn.style.display = isAdmin ? 'flex' : 'none';
     }
 }
 
