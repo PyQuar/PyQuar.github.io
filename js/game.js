@@ -66,23 +66,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadStats();
     }
     
-    console.log('Stats after loading:', gameState.stats);
-    console.log('Last played date:', gameState.lastPlayedDate);
-    console.log('Cloud game state:', cloudGameState);
-    
     setupEventListeners();
     
     // Check if user already played today
     const today = getTodayString();
     let lastPlayed = gameState.lastPlayedDate;
     
-    console.log('Today:', today, 'Last played:', lastPlayed);
-    console.log('Cloud game state:', cloudGameState);
-    
     // PRIORITY 1: Check if game is finished today (from cloud or local)
     if (cloudGameState && cloudGameState.date === today && cloudGameState.gameOver) {
         // User already FINISHED playing today - show completed game
-        console.log('Game already finished today (cloud), restoring completed game...');
         gameState.gameOver = true;
         gameState.isWin = cloudGameState.isWin;
         gameState.currentRow = cloudGameState.currentRow || 0;
@@ -120,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const parsedState = JSON.parse(localState);
             if (parsedState.date === today && parsedState.gameOver) {
-                console.log('Game already finished today (local), restoring...');
                 gameState.gameOver = true;
                 gameState.isWin = parsedState.isWin;
                 gameState.currentRow = parsedState.currentRow || 0;
@@ -168,15 +159,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Only keep if it's from today and not finished
                 if (parsed.date === today && !parsed.gameOver) {
                     shouldClear = false;
-                    console.log('Keeping today\'s in-progress game');
                 }
             } catch (e) {
-                console.log('Error parsing old state, will clear');
+                // Invalid state, will clear
             }
         }
         
         if (shouldClear) {
-            console.log('New day detected! Clearing old game state...');
             localStorage.removeItem('wordWaveGameState');
             localStorage.removeItem('wordWaveLastPlayed');
         }
@@ -209,7 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get today's word (must be called AFTER clearing state)
     const todayWord = getDailyWord();
     gameState.targetWord = todayWord;
-    console.log('Daily word for', today, ':', todayWord);
     
     // Initialize game
     await initializeGame();
@@ -219,7 +207,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Check if there's a cloud game in progress for today
     if (cloudGameState && cloudGameState.date === today && !cloudGameState.gameOver) {
-        console.log('Found cloud game in progress for today, restoring...');
         gameState.currentRow = cloudGameState.currentRow || 0;
         gameState.guesses = cloudGameState.guesses || [];
         gameState.targetWord = cloudGameState.targetWord || todayWord;
@@ -238,8 +225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display stats after loading them (with slight delay to ensure DOM is ready)
     setTimeout(() => {
         if (document.getElementById('gamesPlayed')) {
-            console.log('Calling displayStats...');
-            console.log('Final gameState.stats:', gameState.stats);
             displayStats();
         }
     }, 100);
@@ -329,7 +314,6 @@ async function initializeGame() {
     if (!gameState.targetWord) {
         gameState.targetWord = getDailyWord();
     }
-    console.log('Target word:', gameState.targetWord); // For testing
 }
 
 // Get daily word (same word for everyone each day)
@@ -392,8 +376,6 @@ function createBoard() {
 // Restore board from saved cloud state
 function restoreBoardFromState(cloudState) {
     if (!cloudState || !cloudState.guesses) return;
-    
-    console.log('Restoring board with guesses:', cloudState.guesses);
     
     cloudState.guesses.forEach((guess, rowIndex) => {
         for (let i = 0; i < WORD_LENGTH; i++) {
@@ -1137,27 +1119,20 @@ function saveGameState() {
         date: getTodayString()
     };
     
-    console.log('Saving game state...', gameData);
     localStorage.setItem('wordWaveGameState', JSON.stringify(gameData));
-    console.log('Game state saved - guesses:', gameState.guesses.length, 'words:', gameState.guesses);
 }
 
 function loadGameState() {
     const saved = localStorage.getItem('wordWaveGameState');
-    console.log('Loading game state...', saved ? 'Found saved data' : 'No saved data');
     if (!saved) return;
     
     try {
         const gameData = JSON.parse(saved);
-        console.log('Parsed game data:', gameData);
         
         // Only load if it's from today
         if (gameData.date !== getTodayString()) {
-            console.log('Game data is from a different day, ignoring');
             return;
         }
-        
-        console.log('Loading game from today');
         
         // Restore game state variables
         gameState.currentRow = gameData.currentRow || 0;
@@ -1175,8 +1150,6 @@ function loadGameState() {
         if (gameData.guesses && gameData.guesses.length > 0) {
             restoreBoardFromState(gameData);
         }
-        
-        console.log('Game state loaded -', gameState.guesses.length, 'completed guesses');
     } catch (error) {
         console.error('Error loading game state:', error);
     }
@@ -1490,4 +1463,3 @@ window.createWordListGist = async function(words = WORD_LIST) {
 // ====================================================
 
 console.log('%c🌊 Word Wave Game Loaded!', 'font-size: 20px; font-weight: bold; color: #2dd4bf;');
-console.log('%cToday\'s word:', gameState.targetWord);
