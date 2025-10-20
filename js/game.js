@@ -479,9 +479,17 @@ function setupEventListeners() {
         });
     });
     
-    // Share buttons
-    document.getElementById('shareBtn').addEventListener('click', shareResults);
-    document.getElementById('shareResultBtn').addEventListener('click', shareResults);
+    // Share buttons (with null checks for optional buttons)
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', shareResults);
+    }
+    
+    const shareResultBtn = document.getElementById('shareResultBtn');
+    if (shareResultBtn) {
+        shareResultBtn.addEventListener('click', shareResults);
+    }
+    
     document.getElementById('viewStatsBtn').addEventListener('click', () => {
         closeModal('resultModal');
         openModal('statsModal');
