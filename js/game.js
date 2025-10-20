@@ -318,6 +318,23 @@ async function initializeGame() {
 
 // Get daily word (same word for everyone each day)
 function getDailyWord() {
+    const todayString = getTodayString();
+    
+    // Check if there's a date-specific word override in the Gist
+    const cached = localStorage.getItem(WORD_LIST_CONFIG.CACHE_KEY);
+    if (cached) {
+        try {
+            const cacheData = JSON.parse(cached);
+            if (cacheData.dateOverrides && cacheData.dateOverrides[todayString]) {
+                console.log(`✅ Using date override for ${todayString}: ${cacheData.dateOverrides[todayString]}`);
+                return cacheData.dateOverrides[todayString].toUpperCase();
+            }
+        } catch (e) {
+            console.error('Error reading date overrides:', e);
+        }
+    }
+    
+    // Otherwise use algorithmic word selection
     // Check if dev mode has overridden the date
     const devDate = localStorage.getItem('wordWaveDevDate');
     let today;
@@ -1239,6 +1256,8 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
 // Populate word dropdown
 function populateWordDropdown() {
     const devWordSelect = document.getElementById('devWord');
+    const overrideWordSelect = document.getElementById('overrideWord');
+    
     if (devWordSelect) {
         // Clear existing options
         devWordSelect.innerHTML = '<option value="">Select a word...</option>';
@@ -1250,7 +1269,21 @@ function populateWordDropdown() {
             option.textContent = word;
             devWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated dropdown with ${WORD_LIST.length} words`);
+        console.log(`✅ Populated devWord dropdown with ${WORD_LIST.length} words`);
+    }
+    
+    if (overrideWordSelect) {
+        // Clear existing options
+        overrideWordSelect.innerHTML = '<option value="">Select word...</option>';
+        
+        // Add all words from the list
+        WORD_LIST.forEach(word => {
+            const option = document.createElement('option');
+            option.value = word;
+            option.textContent = word;
+            overrideWordSelect.appendChild(option);
+        });
+        console.log(`✅ Populated overrideWord dropdown with ${WORD_LIST.length} words`);
     }
 }
 
