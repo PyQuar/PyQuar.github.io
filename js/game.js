@@ -1236,10 +1236,11 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
 
 // Populate word dropdown
 function populateWordDropdown() {
+    // Populate devWord dropdown (Force Word - Local Testing)
     const devWordSelect = document.getElementById('devWord');
     if (devWordSelect) {
         // Clear existing options
-        devWordSelect.innerHTML = '<option value="">Select a word...</option>';
+        devWordSelect.innerHTML = '<option value="">-- Current Daily Word --</option>';
         
         // Add all words from the list
         WORD_LIST.forEach(word => {
@@ -1248,7 +1249,23 @@ function populateWordDropdown() {
             option.textContent = word;
             devWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated dropdown with ${WORD_LIST.length} words`);
+        console.log(`✅ Populated devWord dropdown with ${WORD_LIST.length} words`);
+    }
+    
+    // Populate overrideWord dropdown (Global Date Override)
+    const overrideWordSelect = document.getElementById('overrideWord');
+    if (overrideWordSelect) {
+        // Clear existing options
+        overrideWordSelect.innerHTML = '<option value="">Select word...</option>';
+        
+        // Add all words from the list
+        WORD_LIST.forEach(word => {
+            const option = document.createElement('option');
+            option.value = word;
+            option.textContent = word;
+            overrideWordSelect.appendChild(option);
+        });
+        console.log(`✅ Populated overrideWord dropdown with ${WORD_LIST.length} words`);
     }
 }
 
