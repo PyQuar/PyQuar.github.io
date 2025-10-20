@@ -286,13 +286,17 @@ async function loadWordListFromGist() {
         // Update the word list
         WORD_LIST = wordData.words.map(w => w.toUpperCase());
         
-        // Cache the word list
+        // Cache the word list AND date overrides
         localStorage.setItem(WORD_LIST_CONFIG.CACHE_KEY, JSON.stringify({
             words: WORD_LIST,
+            dateOverrides: wordData.dateOverrides || {},
             timestamp: Date.now()
         }));
 
         console.log(`✅ Loaded ${WORD_LIST.length} words from Gist`);
+        if (wordData.dateOverrides && Object.keys(wordData.dateOverrides).length > 0) {
+            console.log(`📅 Loaded ${Object.keys(wordData.dateOverrides).length} date override(s)`);
+        }
         return true;
 
     } catch (error) {
