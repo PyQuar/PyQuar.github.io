@@ -509,6 +509,8 @@ function setupEventListeners() {
     document.getElementById('setWordBtn')?.addEventListener('click', setDevWord);
     document.getElementById('nextDayBtn')?.addEventListener('click', skipToTomorrow);
     document.getElementById('resetDayBtn')?.addEventListener('click', resetToToday);
+    document.getElementById('setOverrideBtn')?.addEventListener('click', setOverrideFromUI);
+    document.getElementById('viewOverridesBtn')?.addEventListener('click', loadOverridesList);
     
     // Auth event listeners
     const loginBtn = document.getElementById('loginBtn');
@@ -1236,11 +1238,10 @@ document.getElementById('hardModeToggle').addEventListener('change', (e) => {
 
 // Populate word dropdown
 function populateWordDropdown() {
-    // Populate devWord dropdown (Force Word - Local Testing)
     const devWordSelect = document.getElementById('devWord');
     if (devWordSelect) {
         // Clear existing options
-        devWordSelect.innerHTML = '<option value="">-- Current Daily Word --</option>';
+        devWordSelect.innerHTML = '<option value="">Select a word...</option>';
         
         // Add all words from the list
         WORD_LIST.forEach(word => {
@@ -1249,23 +1250,7 @@ function populateWordDropdown() {
             option.textContent = word;
             devWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated devWord dropdown with ${WORD_LIST.length} words`);
-    }
-    
-    // Populate overrideWord dropdown (Global Date Override)
-    const overrideWordSelect = document.getElementById('overrideWord');
-    if (overrideWordSelect) {
-        // Clear existing options
-        overrideWordSelect.innerHTML = '<option value="">Select word...</option>';
-        
-        // Add all words from the list
-        WORD_LIST.forEach(word => {
-            const option = document.createElement('option');
-            option.value = word;
-            option.textContent = word;
-            overrideWordSelect.appendChild(option);
-        });
-        console.log(`✅ Populated overrideWord dropdown with ${WORD_LIST.length} words`);
+        console.log(`✅ Populated dropdown with ${WORD_LIST.length} words`);
     }
 }
 
@@ -1377,6 +1362,112 @@ function resetToToday() {
     showMessage('Resetting to today...');
     setTimeout(() => location.reload(), 500);
 }
+
+// Load and display date overrides list
+async function loadOverridesList() {
+    const overridesList = document.getElementById('overridesList');
+    if (!overridesList) return;
+    
+    try {
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            }
+        );
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const gist = await response.json();
+        const fileContent = gist.files['wordwave-words.json']?.content;
+        const wordData = fileContent ? JSON.parse(fileContent) : {};
+        
+        if (wordData.dateOverrides && Object.keys(wordData.dateOverrides).length > 0) {
+            overridesList.innerHTML = '';
+            
+            // Sort by date
+            const sortedDates = Object.keys(wordData.dateOverrides).sort();
+            
+            sortedDates.forEach(date => {
+                const word = wordData.dateOverrides[date];
+                const item = document.createElement('div');
+                item.className = 'override-item';
+                item.innerHTML = `
+                    <span class="override-date">${date}</span>
+                    <span class="override-word">${word}</span>
+                    <button class="override-remove" onclick="removeOverride('${date}')">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                `;
+                overridesList.appendChild(item);
+            });
+        } else {
+            overridesList.innerHTML = '<p style="color: #888; text-align: center; padding: 10px;">No date overrides configured</p>';
+        }
+    } catch (error) {
+        console.error('Error loading overrides:', error);
+        overridesList.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 10px;">Error loading overrides</p>';
+    }
+}
+
+// Set date override from UI
+async function setOverrideFromUI() {
+    const dateInput = document.getElementById('overrideDate');
+    const wordSelect = document.getElementById('overrideWord');
+    
+    if (!dateInput.value || !wordSelect.value) {
+        showMessage('Please select both date and word', true);
+        return;
+    }
+    
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        showMessage('You must be logged in as admin', true);
+        return;
+    }
+    
+    const confirmed = confirm(`Set word "${wordSelect.value}" for ALL players on ${dateInput.value}?`);
+    if (!confirmed) return;
+    
+    showMessage('Setting override...', false);
+    
+    try {
+        await window.setWordForDate(dateInput.value, wordSelect.value);
+        showMessage('Override set successfully!', false);
+        dateInput.value = '';
+        wordSelect.value = '';
+        setTimeout(() => loadOverridesList(), 1000);
+    } catch (error) {
+        showMessage('Failed to set override', true);
+        console.error(error);
+    }
+}
+
+// Remove override from UI
+async function removeOverride(date) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        showMessage('You must be logged in as admin', true);
+        return;
+    }
+    
+    const confirmed = confirm(`Remove override for ${date}?`);
+    if (!confirmed) return;
+    
+    showMessage('Removing override...', false);
+    
+    try {
+        await window.removeDateOverride(date);
+        showMessage('Override removed successfully!', false);
+        setTimeout(() => loadOverridesList(), 1000);
+    } catch (error) {
+        showMessage('Failed to remove override', true);
+        console.error(error);
+    }
+}
+
+// Make removeOverride global for onclick
+window.removeOverride = removeOverride;
 
 // Show/hide dev button based on authentication - only for admins
 function updateDevButtonVisibility() {
@@ -1515,6 +1606,169 @@ window.createWordListGist = async function(words = WORD_LIST) {
         
     } catch (error) {
         console.error('❌ Error creating Gist:', error);
+    }
+};
+
+// Admin function to set word for specific date (call from console when authenticated)
+window.setWordForDate = async function(date, word) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        console.error('❌ You must be logged in to set word for date');
+        return;
+    }
+    
+    if (!WORD_LIST_CONFIG.GIST_ID) {
+        console.error('❌ No Gist ID configured');
+        return;
+    }
+    
+    if (!date || !word) {
+        console.error('❌ Please provide both date and word');
+        console.log('Example: setWordForDate("2025-10-20", "PRESS")');
+        return;
+    }
+    
+    try {
+        // First, fetch current Gist content
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            }
+        );
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch current word list');
+        }
+        
+        const gist = await response.json();
+        const fileContent = gist.files['wordwave-words.json']?.content;
+        const wordData = fileContent ? JSON.parse(fileContent) : { words: WORD_LIST };
+        
+        // Add or update date override
+        if (!wordData.dateOverrides) {
+            wordData.dateOverrides = {};
+        }
+        wordData.dateOverrides[date] = word.toUpperCase();
+        wordData.lastUpdated = new Date().toISOString();
+        
+        // Update the Gist
+        const updateResponse = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${window.authManager.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    files: {
+                        'wordwave-words.json': {
+                            content: JSON.stringify(wordData, null, 2)
+                        }
+                    }
+                })
+            }
+        );
+        
+        if (!updateResponse.ok) {
+            throw new Error(`HTTP ${updateResponse.status}: ${updateResponse.statusText}`);
+        }
+        
+        console.log(`✅ Word for ${date} set to: ${word.toUpperCase()}`);
+        console.log('🌐 All players will get this word on this date');
+        
+        // Clear cache and reload
+        localStorage.removeItem(WORD_LIST_CONFIG.CACHE_KEY);
+        console.log('🔄 Reloading to apply changes...');
+        setTimeout(() => location.reload(), 1000);
+        
+    } catch (error) {
+        console.error('❌ Error setting word for date:', error);
+    }
+};
+
+// Admin function to remove date override (call from console when authenticated)
+window.removeDateOverride = async function(date) {
+    if (!window.authManager || !window.authManager.isAuthenticated) {
+        console.error('❌ You must be logged in to remove date override');
+        return;
+    }
+    
+    if (!WORD_LIST_CONFIG.GIST_ID) {
+        console.error('❌ No Gist ID configured');
+        return;
+    }
+    
+    if (!date) {
+        console.error('❌ Please provide a date');
+        console.log('Example: removeDateOverride("2025-10-20")');
+        return;
+    }
+    
+    try {
+        // Fetch current Gist content
+        const response = await fetch(
+            `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            }
+        );
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch current word list');
+        }
+        
+        const gist = await response.json();
+        const fileContent = gist.files['wordwave-words.json']?.content;
+        const wordData = fileContent ? JSON.parse(fileContent) : { words: WORD_LIST };
+        
+        // Remove date override
+        if (wordData.dateOverrides && wordData.dateOverrides[date]) {
+            delete wordData.dateOverrides[date];
+            wordData.lastUpdated = new Date().toISOString();
+            
+            // Update the Gist
+            const updateResponse = await fetch(
+                `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${window.authManager.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            'wordwave-words.json': {
+                                content: JSON.stringify(wordData, null, 2)
+                            }
+                        }
+                    })
+                }
+            );
+            
+            if (!updateResponse.ok) {
+                throw new Error(`HTTP ${updateResponse.status}: ${updateResponse.statusText}`);
+            }
+            
+            console.log(`✅ Date override removed for ${date}`);
+            console.log('🌐 Will now use algorithmic word selection');
+            
+            // Clear cache and reload
+            localStorage.removeItem(WORD_LIST_CONFIG.CACHE_KEY);
+            console.log('🔄 Reloading to apply changes...');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            console.log(`No override found for ${date}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error removing date override:', error);
     }
 };
 
