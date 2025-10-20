@@ -1269,7 +1269,6 @@ function populateWordDropdown() {
             option.textContent = word;
             devWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated devWord dropdown with ${WORD_LIST.length} words`);
     }
     
     if (overrideWordSelect) {
@@ -1283,7 +1282,6 @@ function populateWordDropdown() {
             option.textContent = word;
             overrideWordSelect.appendChild(option);
         });
-        console.log(`✅ Populated overrideWord dropdown with ${WORD_LIST.length} words`);
     }
 }
 
