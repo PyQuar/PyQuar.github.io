@@ -57,6 +57,13 @@ const resultModal = document.getElementById('resultModal');
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Game initializing...');
     
+    // ==========================================
+    // CRITICAL: Load word list FIRST before anything else!
+    // This ensures dateOverrides are available when getDailyWord() is called
+    // ==========================================
+    await loadWordListFromGist();
+    console.log('✅ Word list loaded, ready to start game');
+    
     // Initialize authentication first
     let cloudGameState = null;
     if (window.authManager) {
@@ -242,6 +249,12 @@ async function loadWordListFromGist() {
             if (cacheAge < WORD_LIST_CONFIG.CACHE_DURATION) {
                 console.log('Using cached word list');
                 WORD_LIST = cacheData.words;
+                // Log cached overrides for debugging
+                if (cacheData.dateOverrides && Object.keys(cacheData.dateOverrides).length > 0) {
+                    console.log(`📅 Using cached date overrides:`, cacheData.dateOverrides);
+                } else {
+                    console.log('⚠️ No date overrides in cache');
+                }
                 return true;
             }
         } catch (e) {
@@ -257,16 +270,28 @@ async function loadWordListFromGist() {
 
     try {
         console.log('Fetching word list from Gist...');
+        
+        // Try to use auth token if available for better rate limits
+        const headers = {
+            'Accept': 'application/vnd.github.v3+json'
+        };
+        
+        if (window.authManager && window.authManager.token) {
+            headers['Authorization'] = `Bearer ${window.authManager.token}`;
+            console.log('📡 Fetching with authentication');
+        } else {
+            console.log('📡 Fetching without authentication (public access)');
+        }
+        
         const response = await fetch(
             `https://api.github.com/gists/${WORD_LIST_CONFIG.GIST_ID}`,
-            {
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            }
+            { headers }
         );
 
+        console.log('📡 Gist fetch response status:', response.status);
+        
         if (!response.ok) {
+            console.error('❌ Gist fetch failed:', response.status, response.statusText);
             throw new Error('Failed to fetch word list');
         }
 
@@ -308,7 +333,7 @@ async function loadWordListFromGist() {
 
 // Initialize game
 async function initializeGame() {
-    // Load word list from Gist first
+    // Reload word list (will use cache if fresh, or refetch if expired)
     await loadWordListFromGist();
     
     // Populate the dev tools word dropdown with updated list
