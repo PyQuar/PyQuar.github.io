@@ -1,0 +1,27 @@
+name: Inject GitHub Token
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  inject-token:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Inject token into register.js
+      run: |
+        # Créer un fichier config.js avec le token
+        echo "window.GITHUB_TOKEN = '${{ secrets.GIST_TOKEN }}';" > js/config.js
+        
+    - name: Deploy to GitHub Pages
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add js/config.js
+        git commit -m "Inject token via Actions" || echo "No changes to commit"
+        git push

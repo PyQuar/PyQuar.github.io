@@ -2,9 +2,12 @@
 
 // Configuration GitHub Gist
 const GIST_CONFIG = {
-    GIST_ID: '403a285df15c8e9d8b33058a63ae9c20', // ID du Gist (sans l'URL complète)
+    GIST_ID: '403a285df15c8e9d8b33058a63ae9c20',
     FILENAME: 'essai-league-registrations.json',
-    TOKEN: null // ⚠️ NE JAMAIS mettre de token ici ! Utilisez un backend sécurisé
+    // Le token sera injecté via GitHub Actions
+    get TOKEN() {
+        return window.GITHUB_TOKEN || '';
+    }
 };
 
 // État de l'application
@@ -171,55 +174,61 @@ function showMessage(type, message) {
 }
 
 // ===== GIST INTEGRATION =====
+// Sauvegarder dans GitHub Gist
 async function saveToGist() {
-    // Pour le moment, on sauvegarde localement
-    // Vous devrez implémenter l'authentification GitHub pour sauvegarder dans un vrai Gist
-    localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
-    
-    await fetch('https://script.google.com/macros/s/AKfycbzukPk5-dGMvF-cCMl-LjX0CugWnhLmubzaS9G4OJLtpSeCOLs04WmkRLPxHws06UAI/exec', {
-    method: 'POST',
-    body: JSON.stringify(formData)
-    });
-    
-    // TODO: Implémenter la sauvegarde dans GitHub Gist
-    // Nécessite l'authentification OAuth GitHub
-
-    const response = await fetch(`https://api.github.com/gists/${GIST_CONFIG.GIST_ID}`, {
-        method: 'PATCH',
-        headers: {
-            'Authorization': `token ${GIST_CONFIG.TOKEN}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            files: {
-                [GIST_CONFIG.FILENAME]: {
-                    content: JSON.stringify(participants, null, 2)
+    try {
+        localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
+        
+        if (!GIST_CONFIG.TOKEN) {
+            console.warn('Token GitHub non disponible - sauvegarde locale uniquement');
+            return;
+        }
+        
+        const response = await fetch(`https://api.github.com/gists/${GIST_CONFIG.GIST_ID}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `token ${GIST_CONFIG.TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                files: {
+                    [GIST_CONFIG.FILENAME]: {
+                        content: JSON.stringify(participants, null, 2)
+                    }
                 }
-            }
-        })
-    });
-    
-    if (!response.ok) {
-        throw new Error('Erreur lors de la sauvegarde dans le Gist');
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de la sauvegarde dans le Gist');
+        }
+        
+        console.log('Sauvegarde dans Gist réussie');
+    } catch (error) {
+        console.error('Erreur de sauvegarde:', error);
+        throw error;
     }
-  
 }
 
+// Charger depuis GitHub Gist
 async function loadFromGist() {
     try {
-        // Pour le moment, on charge depuis localStorage
+        // Charger depuis localStorage d'abord
         const stored = localStorage.getItem('essai-league-registrations');
         if (stored) {
             participants = JSON.parse(stored);
         }
         
-        // TODO: Charger depuis GitHub Gist
-       
+        // Puis charger depuis Gist (public, pas besoin de token)
         const response = await fetch(`https://api.github.com/gists/${GIST_CONFIG.GIST_ID}`);
-        const gist = await response.json();
-        const content = gist.files[GIST_CONFIG.FILENAME].content;
-        participants = JSON.parse(content);
-      
+        
+        if (response.ok) {
+            const gist = await response.json();
+            const content = gist.files[GIST_CONFIG.FILENAME].content;
+            participants = JSON.parse(content);
+            localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
+            console.log(`${participants.length} participants chargés depuis Gist`);
+        }
         
         displayParticipants();
     } catch (error) {
