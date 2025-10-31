@@ -2,10 +2,25 @@
 // This endpoint manages tournament registrations in a Gist using PyQuar's token
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Enable CORS for all origins (or specify your domain)
+  const allowedOrigins = [
+    'https://pyquar.github.io',
+    'https://wavyessai.me',
+    'http://localhost:5500',
+    'http://localhost:3000',
+    'http://127.0.0.1:5500'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
 
   // Handle preflight request
   if (req.method === 'OPTIONS') {
