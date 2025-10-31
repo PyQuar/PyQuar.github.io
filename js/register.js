@@ -105,6 +105,15 @@ registrationForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Inscription en cours...</span>';
     
+    // Vérifier l'acceptation du règlement
+    const termsEl = document.getElementById('termsAccepted');
+    if (termsEl && !termsEl.checked) {
+        showMessage('error', 'Vous devez accepter le règlement pour vous inscrire.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> <span>S\'inscrire au Tournoi</span>';
+        return;
+    }
+    
     // Récupérer les données du formulaire
     const formData = {
         firstName: document.getElementById('firstName').value.trim(),
