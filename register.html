@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essai League - Inscription Tournoi | Wavy Essai</title>
+    <link rel="icon" type="image/png" href="assets/clublogo.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/register.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo-link">
+                <div class="nav-logo">
+                    <img src="assets/clublogo.png" alt="Wavy Essai Logo">
+                    <span>WAVY ESSAI</span>
+                </div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#events" class="nav-link">Events</a></li>
+                <li><a href="register.html" class="nav-link active">Register</a></li>
+                <li><a href="papers.html" class="nav-link">Papers</a></li>
+                <li><a href="game.html" class="nav-link">Game</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="register-hero">
+        <div class="hero-stadium-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="trophy-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">ESSAI LEAGUE</span>
+                    <span class="subtitle">Tournoi de Football 2025</span>
+                </h1>
+                <p class="hero-description">
+                    <i class="fas fa-calendar-alt"></i> Novembre 2025 | 
+                    <i class="fas fa-map-marker-alt"></i> Maison de Jeunesse, La Soukra
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalPlayers">0</span>
+                        <span class="stat-label">Joueurs Inscrits</span>
+                    </div>
+    
+                </div>
+            </div>
+        </div>
+        <div class="soccer-ball ball-1">⚽</div>
+        <div class="soccer-ball ball-2">⚽</div>
+        <div class="soccer-ball ball-3">⚽</div>
+    </section>
+
+    <!-- Registration Form Section -->
+    <section class="registration-section">
+        <div class="container">
+            <div class="registration-grid">
+                <!-- Form Card -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-plus"></i> Inscription au Tournoi</h2>
+                        <p>Remplissez le formulaire pour rejoindre la compétition</p>
+                    </div>
+                    
+                    <form id="registrationForm" class="registration-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">
+                                    <i class="fas fa-user"></i> Prénom *
+                                </label>
+                                <input type="text" id="firstName" name="firstName" required 
+                                       placeholder="Votre prénom">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName">
+                                    <i class="fas fa-user"></i> Nom *
+                                </label>
+                                <input type="text" id="lastName" name="lastName" required 
+                                       placeholder="Votre nom">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="idCard">
+                                <i class="fas fa-id-card"></i> Numéro de Carte d'Identité *
+                            </label>
+                            <input type="text" id="idCard" name="idCard" required 
+                                   placeholder="Ex: 12345678"
+                                   pattern="[0-9]{8}"
+                                   title="8 chiffres requis">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i> Email
+                            </label>
+                            <input type="email" id="email" name="email" 
+                                   placeholder="votre.email@exemple.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">
+                                <i class="fas fa-phone"></i> Téléphone
+                            </label>
+                            <input type="tel" id="phone" name="phone" 
+                                   placeholder="Ex: +216 12 345 678">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-futbol"></i> Classement des Postes (Préférences) *
+                            </label>
+                            <p class="form-hint">Glissez pour organiser vos préférences (1er choix en haut)</p>
+                            <div class="positions-container" id="positionsContainer">
+                                <div class="position-item" draggable="true" data-position="attaque">
+                                    <div class="drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <div class="position-icon attaque">
+                                        <i class="fas fa-crosshairs"></i>
+                                    </div>
+                                    <div class="position-info">
+                                        <span class="position-name">Attaque</span>
+                                        <span class="position-rank">1er choix</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="position-item" draggable="true" data-position="milieu">
+                                    <div class="drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <div class="position-icon milieu">
+                                        <i class="fas fa-compass"></i>
+                                    </div>
+                                    <div class="position-info">
+                                        <span class="position-name">Milieu</span>
+                                        <span class="position-rank">2ème choix</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="position-item" draggable="true" data-position="defense">
+                                    <div class="drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <div class="position-icon defense">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="position-info">
+                                        <span class="position-name">Défense</span>
+                                        <span class="position-rank">3ème choix</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>S'inscrire au Tournoi</span>
+                            </button>
+                        </div>
+
+                        <div class="form-message" id="formMessage"></div>
+                    </form>
+                </div>
+
+                <!-- Info Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-info-circle"></i> Informations du Tournoi</h3>
+                    </div>
+                    
+                    <div class="info-content">
+                        <div class="info-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <strong>Date</strong>
+                                <p>Novembre 2025 (Date exacte à confirmer)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Horaires</strong>
+                                <p>8:00 AM - 5:00 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Lieu</strong>
+                                <p>Maison de Jeunesse, La Soukra</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Format</strong>
+                                <p>Tournoi par équipes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-trophy"></i>
+                            <div>
+                                <strong>Récompenses</strong>
+                                <p>Trophées pour les gagnants</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-tshirt"></i>
+                            <div>
+                                <strong>Équipement</strong>
+                                <p>Apportez vos chaussures de foot et une bouteille d'eau</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> L'inscription est gratuite mais obligatoire</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Participants List Section -->
+    <section class="participants-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Équipe en Formation</span>
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i> Participants Inscrits
+                </h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="participants-filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-users"></i> Tous (<span id="countAll">0</span>)
+                </button>
+                <button class="filter-btn" data-filter="attaque">
+                    <i class="fas fa-crosshairs"></i> Attaquants (<span id="countAttaque">0</span>)
+                </button>
+                <button class="filter-btn" data-filter="milieu">
+                    <i class="fas fa-compass"></i> Milieux (<span id="countMilieu">0</span>)
+                </button>
+                <button class="filter-btn" data-filter="defense">
+                    <i class="fas fa-shield-alt"></i> Défenseurs (<span id="countDefense">0</span>)
+                </button>
+            </div>
+
+            <div class="participants-grid" id="participantsGrid">
+                <div class="loading-message">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Chargement des participants...</p>
+                </div>
+            </div>
+
+            <div class="no-participants" id="noParticipants" style="display: none;">
+                <i class="fas fa-user-plus"></i>
+                <h3>Aucun participant pour le moment</h3>
+                <p>Soyez le premier à vous inscrire au tournoi !</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="assets/clublogo.png" alt="Wavy Essai Logo">
+                        <h3>WAVY ESSAI</h3>
+                    </div>
+                    <p>Where stories come to life and champions are made.</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#events">Events</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contact@wavyessai.com</li>
+                        <li><i class="fas fa-phone"></i> +216 22 222 227</li>
+                        <li><i class="fas fa-map-marker-alt"></i> ESSAI, Charguia 2</li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Suivez-nous</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61581991239863"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/wavy.club.essai?igsh=MWRlamg1ejRkNXNl"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Wavy Essai Press Club. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>

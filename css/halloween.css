@@ -1,0 +1,326 @@
+/* 🎃 Halloween Theme Override 🎃 */
+
+:root {
+    /* Halloween Color Palette */
+    --halloween-orange: #ff6b1a;
+    --halloween-purple: #6b2fb5;
+    --halloween-dark: #1a0e2e;
+    --halloween-black: #0a0014;
+    --halloween-green: #39ff14;
+    --halloween-blood: #8b0000;
+    --halloween-ghost: rgba(255, 255, 255, 0.1);
+}
+
+/* Spooky Background */
+body {
+    background: linear-gradient(135deg, var(--halloween-black) 0%, var(--halloween-dark) 50%, #2a1a3e 100%) !important;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animated floating ghosts */
+body::before {
+    content: "👻";
+    position: fixed;
+    top: -50px;
+    left: 10%;
+    font-size: 3rem;
+    animation: float-ghost 15s infinite ease-in-out;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+body::after {
+    content: "🎃";
+    position: fixed;
+    top: -50px;
+    right: 15%;
+    font-size: 2.5rem;
+    animation: float-pumpkin 18s infinite ease-in-out;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+@keyframes float-ghost {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(100vh) rotate(5deg); }
+    50% { transform: translateY(200vh) rotate(-5deg); }
+    75% { transform: translateY(300vh) rotate(5deg); }
+}
+
+@keyframes float-pumpkin {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(120vh) rotate(-10deg); }
+    66% { transform: translateY(240vh) rotate(10deg); }
+}
+
+/* Spooky text glow */
+.hero-title,
+.game-title,
+h1, h2, h3 {
+    text-shadow: 0 0 10px var(--halloween-orange),
+                 0 0 20px var(--halloween-orange),
+                 0 0 30px var(--halloween-purple) !important;
+    animation: spooky-glow 2s infinite alternate !important;
+}
+
+@keyframes spooky-glow {
+    from { 
+        text-shadow: 0 0 10px var(--halloween-orange),
+                     0 0 20px var(--halloween-orange);
+    }
+    to { 
+        text-shadow: 0 0 20px var(--halloween-orange),
+                     0 0 40px var(--halloween-purple),
+                     0 0 60px var(--halloween-purple);
+    }
+}
+
+/* Halloween buttons */
+.btn, .cta-btn, .login-btn, .key {
+    background: linear-gradient(135deg, var(--halloween-orange) 0%, var(--halloween-blood) 100%) !important;
+    border: 2px solid var(--halloween-orange) !important;
+    box-shadow: 0 0 15px rgba(255, 107, 26, 0.5) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn:hover, .cta-btn:hover, .login-btn:hover, .key:hover {
+    background: linear-gradient(135deg, var(--halloween-blood) 0%, var(--halloween-orange) 100%) !important;
+    box-shadow: 0 0 25px rgba(255, 107, 26, 0.8),
+                0 0 50px var(--halloween-purple) !important;
+    transform: scale(1.05) !important;
+}
+
+/* Spooky cards */
+.feature-card, .stat-card, .paper-card {
+    background: linear-gradient(135deg, rgba(26, 14, 46, 0.9) 0%, rgba(42, 26, 62, 0.9) 100%) !important;
+    border: 2px solid var(--halloween-purple) !important;
+    box-shadow: 0 8px 32px rgba(107, 47, 181, 0.3),
+                inset 0 0 20px rgba(255, 107, 26, 0.1) !important;
+}
+
+.feature-card:hover, .paper-card:hover {
+    border-color: var(--halloween-orange) !important;
+    box-shadow: 0 12px 48px rgba(255, 107, 26, 0.4),
+                inset 0 0 30px rgba(107, 47, 181, 0.2) !important;
+    transform: translateY(-10px) scale(1.02) !important;
+}
+
+/* Spooky tiles (for game board) */
+.tile {
+    background: rgba(26, 14, 46, 0.8) !important;
+    border: 2px solid var(--halloween-purple) !important;
+    box-shadow: inset 0 0 10px rgba(255, 107, 26, 0.1) !important;
+}
+
+.tile.correct {
+    background: linear-gradient(135deg, var(--halloween-orange), var(--halloween-blood)) !important;
+    border-color: var(--halloween-orange) !important;
+    box-shadow: 0 0 20px var(--halloween-orange) !important;
+}
+
+.tile.present {
+    background: linear-gradient(135deg, var(--halloween-purple), #8b2fb5) !important;
+    border-color: var(--halloween-purple) !important;
+    box-shadow: 0 0 20px var(--halloween-purple) !important;
+}
+
+/* Spooky navbar */
+.navbar, .game-top-bar {
+    background: rgba(26, 14, 46, 0.95) !important;
+    border-bottom: 2px solid var(--halloween-orange) !important;
+    box-shadow: 0 4px 20px rgba(255, 107, 26, 0.3) !important;
+}
+
+/* Spooky icons */
+.fa-wave-square::before {
+    content: "🎃" !important;
+    font-family: "Segoe UI Emoji", sans-serif !important;
+}
+
+.feature-icon i, .stat-icon i {
+    color: var(--halloween-orange) !important;
+    filter: drop-shadow(0 0 10px var(--halloween-orange));
+}
+
+/* Halloween menu overlay */
+.game-menu-overlay {
+    background: rgba(10, 0, 20, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+.game-menu-item {
+    background: linear-gradient(135deg, rgba(107, 47, 181, 0.2), rgba(255, 107, 26, 0.2)) !important;
+    border: 2px solid var(--halloween-purple) !important;
+}
+
+.game-menu-item:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 26, 0.3), rgba(107, 47, 181, 0.3)) !important;
+    border-color: var(--halloween-orange) !important;
+    box-shadow: 0 0 20px var(--halloween-orange) !important;
+}
+
+/* Spooky modals */
+.modal-content {
+    background: linear-gradient(135deg, var(--halloween-dark) 0%, #2a1a3e 100%) !important;
+    border: 3px solid var(--halloween-orange) !important;
+    box-shadow: 0 10px 60px rgba(255, 107, 26, 0.5),
+                inset 0 0 30px rgba(107, 47, 181, 0.2) !important;
+}
+
+.modal-header {
+    border-bottom: 2px solid var(--halloween-orange) !important;
+}
+
+/* Halloween keyboard */
+.keyboard {
+    background: rgba(26, 14, 46, 0.5) !important;
+    border: 2px solid var(--halloween-purple) !important;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+/* Floating bats */
+.hero::before,
+.game-container::before {
+    content: "🦇";
+    position: absolute;
+    top: 20px;
+    right: 10%;
+    font-size: 2rem;
+    animation: bat-fly 8s infinite ease-in-out;
+    opacity: 0.5;
+}
+
+@keyframes bat-fly {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-50px, 30px) rotate(-15deg); }
+    50% { transform: translate(-100px, 0) rotate(0deg); }
+    75% { transform: translate(-50px, -30px) rotate(15deg); }
+}
+
+/* Spider web effect */
+.hero::after {
+    content: "🕸️";
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 8rem;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+/* Creepy cursor effect */
+body {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><text y="20" font-size="20">🎃</text></svg>'), auto !important;
+}
+
+a, button, .key {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><text y="20" font-size="20">👻</text></svg>'), pointer !important;
+}
+
+/* Eerie green glow for stats */
+.stat-value {
+    color: var(--halloween-green) !important;
+    text-shadow: 0 0 10px var(--halloween-green) !important;
+}
+
+/* Blood drip effect for headers */
+.modal-header h2::after,
+.hero-title::after {
+    content: "🩸";
+    position: absolute;
+    right: -30px;
+    animation: drip 3s infinite;
+    font-size: 1.5rem;
+}
+
+@keyframes drip {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(10px); opacity: 0.5; }
+}
+
+/* Spooky fog effect */
+.game-main::before,
+.hero::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: linear-gradient(to top, rgba(107, 47, 181, 0.3), transparent);
+    pointer-events: none;
+    animation: fog 10s infinite ease-in-out;
+}
+
+@keyframes fog {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Halloween message container */
+.message-container {
+    background: linear-gradient(135deg, var(--halloween-orange), var(--halloween-blood)) !important;
+    border: 2px solid var(--halloween-orange) !important;
+    box-shadow: 0 0 30px var(--halloween-orange) !important;
+}
+
+/* Spooky scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--halloween-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--halloween-orange), var(--halloween-purple));
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--halloween-orange);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--halloween-purple), var(--halloween-orange));
+}
+
+/* Halloween countdown timer */
+.countdown {
+    color: var(--halloween-orange) !important;
+    text-shadow: 0 0 20px var(--halloween-orange) !important;
+    font-weight: 900 !important;
+}
+
+/* Spooky paper cards */
+.paper-date {
+    color: var(--halloween-orange) !important;
+}
+
+.paper-title {
+    color: var(--halloween-green) !important;
+}
+
+/* Halloween info items */
+.info-item, .game-info {
+    background: rgba(26, 14, 46, 0.8) !important;
+    border: 2px solid var(--halloween-purple) !important;
+}
+
+/* Creepy loading animation */
+@keyframes creepy-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 20px var(--halloween-orange);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 40px var(--halloween-purple);
+    }
+}
+
+.btn-stats, .btn-primary {
+    animation: creepy-pulse 2s infinite !important;
+}
