@@ -1,13 +1,9 @@
 // ===== ESSAI LEAGUE - REGISTRATION SYSTEM =====
 
-// Configuration GitHub Gist
-const GIST_CONFIG = {
-    GIST_ID: '403a285df15c8e9d8b33058a63ae9c20',
-    FILENAME: 'essai-league-registrations.json',
-    // Le token sera injecté via GitHub Actions
-    get TOKEN() {
-        return window.GITHUB_TOKEN || '';
-    }
+// Configuration API Vercel
+const API_CONFIG = {
+    BASE_URL: 'https://word-wave-auth-proxy.vercel.app',
+    REGISTER_ENDPOINT: '/api/register-tournament',
 };
 
 // État de l'application
@@ -122,16 +118,27 @@ registrationForm.addEventListener('submit', async (e) => {
     };
     
     try {
-        // Vérifier si la personne est déjà inscrite
-        if (isAlreadyRegistered(formData.idCard)) {
-            throw new Error('Cette carte d\'identité est déjà enregistrée.');
+        // Envoyer au backend Vercel
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.REGISTER_ENDPOINT}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            if (response.status === 409) {
+                throw new Error('Cette carte d\'identité est déjà enregistrée.');
+            }
+            throw new Error(result.error || 'Erreur lors de l\'inscription');
         }
         
-        // Ajouter le participant
-        participants.push(formData);
-        
-        // Sauvegarder dans le Gist
-        await saveToGist();
+        // Mettre à jour la liste locale
+        participants = result.participants || [];
+        localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
         
         // Afficher le message de succès
         showMessage('success', `✅ Inscription réussie ! Bienvenue ${formData.firstName} ${formData.lastName} !`);
@@ -174,43 +181,14 @@ function showMessage(type, message) {
 }
 
 // ===== GIST INTEGRATION =====
-// Sauvegarder dans GitHub Gist
+// Sauvegarder dans GitHub Gist (via Vercel proxy)
 async function saveToGist() {
-    try {
-        localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
-        
-        if (!GIST_CONFIG.TOKEN) {
-            console.warn('Token GitHub non disponible - sauvegarde locale uniquement');
-            return;
-        }
-        
-        const response = await fetch(`https://api.github.com/gists/${GIST_CONFIG.GIST_ID}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `token ${GIST_CONFIG.TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                files: {
-                    [GIST_CONFIG.FILENAME]: {
-                        content: JSON.stringify(participants, null, 2)
-                    }
-                }
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Erreur lors de la sauvegarde dans le Gist');
-        }
-        
-        console.log('Sauvegarde dans Gist réussie');
-    } catch (error) {
-        console.error('Erreur de sauvegarde:', error);
-        throw error;
-    }
+    // Cette fonction n'est plus utilisée car tout passe par l'API Vercel
+    localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
+    console.log('Sauvegarde locale effectuée');
 }
 
-// Charger depuis GitHub Gist
+// Charger depuis GitHub Gist (via Vercel proxy)
 async function loadFromGist() {
     try {
         // Charger depuis localStorage d'abord
@@ -219,15 +197,14 @@ async function loadFromGist() {
             participants = JSON.parse(stored);
         }
         
-        // Puis charger depuis Gist (public, pas besoin de token)
-        const response = await fetch(`https://api.github.com/gists/${GIST_CONFIG.GIST_ID}`);
+        // Puis charger depuis l'API Vercel
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.REGISTER_ENDPOINT}`);
         
         if (response.ok) {
-            const gist = await response.json();
-            const content = gist.files[GIST_CONFIG.FILENAME].content;
-            participants = JSON.parse(content);
+            const data = await response.json();
+            participants = data.participants || [];
             localStorage.setItem('essai-league-registrations', JSON.stringify(participants));
-            console.log(`${participants.length} participants chargés depuis Gist`);
+            console.log(`${participants.length} participants chargés depuis le serveur`);
         }
         
         displayParticipants();
