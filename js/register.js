@@ -255,8 +255,10 @@ function displayParticipants() {
     const noParticipants = document.getElementById('noParticipants');
     const totalPlayersEl = document.getElementById('totalPlayers');
     
-    // Mettre à jour le compteur total
-    totalPlayersEl.textContent = participants.length;
+    // Mettre à jour le compteur total (si l'élément existe)
+    if (totalPlayersEl) {
+        totalPlayersEl.textContent = participants.length;
+    }
     
     // Filtrer les participants
     let filtered = participants;
@@ -300,9 +302,6 @@ function createParticipantCard(participant) {
                 <div class="participant-avatar">${initials}</div>
                 <div class="participant-info">
                     <h3>${participant.firstName} ${participant.lastName}</h3>
-                    <div class="participant-id">
-                        <i class="fas fa-id-card"></i> ${participant.idCard}
-                    </div>
                 </div>
             </div>
             
@@ -331,10 +330,11 @@ function updateFilterCounts() {
     const countMilieu = document.getElementById('countMilieu');
     const countDefense = document.getElementById('countDefense');
     
-    countAll.textContent = participants.length;
-    countAttaque.textContent = participants.filter(p => p.positions[0] === 'attaque').length;
-    countMilieu.textContent = participants.filter(p => p.positions[0] === 'milieu').length;
-    countDefense.textContent = participants.filter(p => p.positions[0] === 'defense').length;
+    // Mettre à jour les compteurs uniquement si les éléments existent
+    if (countAll) countAll.textContent = participants.length;
+    if (countAttaque) countAttaque.textContent = participants.filter(p => p.positions[0] === 'attaque').length;
+    if (countMilieu) countMilieu.textContent = participants.filter(p => p.positions[0] === 'milieu').length;
+    if (countDefense) countDefense.textContent = participants.filter(p => p.positions[0] === 'defense').length;
 }
 
 // ===== FILTERS =====
