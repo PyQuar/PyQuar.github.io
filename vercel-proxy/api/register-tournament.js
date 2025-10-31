@@ -29,10 +29,10 @@ export default async function handler(req, res) {
 
   const GIST_ID = '403a285df15c8e9d8b33058a63ae9c20';
   const FILENAME = 'essai-league-registrations.json';
-  const ADMIN_TOKEN = process.env.GITHUB_ADMIN_TOKEN;
+  const ADMIN_TOKEN = process.env.PYQUAR_GITHUB_TOKEN || process.env.GITHUB_ADMIN_TOKEN;
 
   if (!ADMIN_TOKEN) {
-    return res.status(500).json({ error: 'Server configuration error' });
+    return res.status(500).json({ error: 'Server configuration error: Missing GitHub token' });
   }
 
   // GET - Retrieve participants
