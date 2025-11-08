@@ -447,6 +447,33 @@
     color: var(--neon-blue);
 }
 
+.btn-like {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+.btn-like:hover {
+    color: var(--neon-pink);
+}
+
+.btn-like:hover i {
+    color: var(--neon-pink);
+    transform: scale(1.2);
+}
+
+.btn-like i {
+    color: var(--neon-pink);
+    transition: all 0.3s ease;
+}
+
 .btn-listen {
     width: 100%;
     padding: 1rem;
