@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcasts - La Voix des Étudiants | Wavy Essai</title>
+    <link rel="icon" type="image/png" href="assets/clublogo.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/podcasts.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="podcasts-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo-link">
+                <div class="nav-logo">
+                    <img src="assets/clublogo.png" alt="Wavy Essai Logo">
+                    <span>WAVY ESSAI</span>
+                </div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#events" class="nav-link">Events</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="podcast-hero">
+        <div class="hero-bg-overlay"></div>
+        <canvas id="waveCanvas" class="wave-canvas"></canvas>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="live-badge">
+                    <span class="pulse-dot"></span>
+                    EN DIRECT
+                </div>
+                
+                <h1 class="hero-title">
+                    <span class="gradient-text">LA VOIX DES ÉTUDIANTS</span>
+                    <span class="subtitle">Sans filtre</span>
+                </h1>
+                
+                <p class="hero-description">
+                    Nos podcasts explorent l'actualité, la culture et la vie universitaire 
+                    avec la voix des jeunes journalistes d'ESSAI.
+                </p>
+                
+                <button class="btn-hero" id="playLatestBtn">
+                    <i class="fas fa-play"></i>
+                    <span>Écouter le dernier épisode</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Episodes Section -->
+    <section class="episodes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-microphone-alt"></i>
+                    Nos Épisodes
+                </h2>
+                <div class="episodes-count">
+                    <span id="episodeCount">1</span> épisode<span id="episodePlural"></span> disponible<span id="availablePlural"></span>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <button class="filter-chip active" data-filter="all">
+                    <i class="fas fa-podcast"></i> Tous
+                </button>
+                <button class="filter-chip" data-filter="actualite">
+                    <i class="fas fa-newspaper"></i> Actualité
+                </button>
+                <button class="filter-chip" data-filter="campus">
+                    <i class="fas fa-university"></i> Campus
+                </button>
+                <button class="filter-chip" data-filter="culture">
+                    <i class="fas fa-palette"></i> Culture
+                </button>
+                <button class="filter-chip" data-filter="debat">
+                    <i class="fas fa-comments"></i> Débat
+                </button>
+            </div>
+
+            <!-- Episodes Grid -->
+            <div class="episodes-grid" id="episodesGrid">
+                <!-- Episode 1 -->
+                <div class="episode-card" data-category="actualite" data-episode="1">
+                    <div class="episode-cover">
+                        <div class="cover-overlay">
+                            <button class="play-btn" data-audio="podcasts/Episode 1.wav" data-thumbnail="podcasts/Thumbnails/Episode1.jpg">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        <img src="podcasts/Thumbnails/Episode1.jpg" alt="Episode 1">
+                        <div class="episode-badge actualite">Actualité</div>
+                    </div>
+                    
+                    <div class="episode-info">
+                        <h3 class="episode-title">Premier Épisode - Lancement du Club</h3>
+                        <p class="episode-date">
+                            <i class="fas fa-calendar"></i> 
+                            <span>Novembre 2025</span>
+                        </p>
+                        <p class="episode-description">
+                            Découvrez le premier épisode de notre podcast ! On discute du lancement 
+                            du club de presse, de nos objectifs et de ce qui nous attend cette année.
+                        </p>
+                        
+                        <div class="episode-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="duration-1">--:--</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-headphones"></i>
+                                <span>0 écoutes</span>
+                            </span>
+                        </div>
+                        
+                        <button class="btn-listen" data-audio="podcasts/Episode 1.wav" data-thumbnail="podcasts/Thumbnails/Episode1.jpg">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Écouter</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Template for future episodes -->
+                <!-- You can duplicate this structure for more episodes -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Audio Player (Sticky Bottom) -->
+    <div class="audio-player" id="audioPlayer">
+        <div class="player-progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="player-content">
+            <div class="player-info">
+                <img src="assets/clublogo.png" alt="Current Episode" class="player-thumbnail">
+                <div class="player-text">
+                    <h4 class="player-title" id="playerTitle">Aucun épisode en lecture</h4>
+                    <p class="player-subtitle" id="playerSubtitle">Wavy Talks the podcast you want</p>
+                </div>
+            </div>
+            
+            <div class="player-controls">
+                <button class="control-btn" id="rewindBtn">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button class="control-btn play-pause" id="playPauseBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-btn" id="forwardBtn">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
+            
+            <div class="player-time">
+                <span id="currentTime">0:00</span>
+                <span class="time-separator">/</span>
+                <span id="totalTime">0:00</span>
+            </div>
+            
+            <div class="player-volume">
+                <button class="control-btn" id="volumeBtn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+            </div>
+        </div>
+        
+        <audio id="audioElement" preload="metadata"></audio>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="assets/clublogo.png" alt="Wavy Essai Logo">
+                        <h3>WAVY ESSAI</h3>
+                    </div>
+                    <p>Where stories come to life and voices are heard.</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="podcasts.html">Podcasts</a></li>
+                        <li><a href="papers.html">Papers</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contact@wavyessai.com</li>
+                        <li><i class="fas fa-phone"></i> +216 22 222 227</li>
+                        <li><i class="fas fa-map-marker-alt"></i> ESSAI, Charguia 2</li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Suivez-nous</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61581991239863"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/wavy.club.essai?igsh=MWRlamg1ejRkNXNl"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Wavy Essai Press Club. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/persistent-audio.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/podcasts.js"></script>
+</body>
+</html>
