@@ -13,6 +13,11 @@
       "src": "api/register-tournament.js",
       "use": "@vercel/node"
     }
+    ,
+    {
+      "src": "api/podcast-stats.js",
+      "use": "@vercel/node"
+    }
   ],
   "routes": [
     {
@@ -26,6 +31,11 @@
     {
       "src": "/api/register-tournament",
       "dest": "/api/register-tournament.js"
+    }
+    ,
+    {
+      "src": "/api/podcast-stats",
+      "dest": "/api/podcast-stats.js"
     }
   ]
 }
