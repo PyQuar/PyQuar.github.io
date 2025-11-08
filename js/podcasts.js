@@ -374,4 +374,85 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('episodeCount').textContent = totalEpisodes;
     document.getElementById('episodePlural').textContent = totalEpisodes > 1 ? 's' : '';
     document.getElementById('availablePlural').textContent = totalEpisodes > 1 ? 's' : '';
+
+    // Like & View system
+    document.querySelectorAll('.btn-like').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const episodeId = btn.dataset.episode;
+            await incrementLike(episodeId);
+        });
+    });
+
+    document.querySelectorAll('.btn-listen, .play-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const card = btn.closest('.episode-card');
+            const episodeId = card?.dataset.episode;
+            if (episodeId) await incrementView(episodeId);
+        });
+    });
+
+    // Charger les likes/vues au démarrage
+    loadLikesViews();
 });
+
+// API Vercel config for podcast stats
+const PODCAST_API_CONFIG = {
+    BASE_URL: 'https://word-wave-auth-proxy.vercel.app',
+    ENDPOINT: '/api/podcast-stats',
+};
+
+// Charger les likes/vues depuis le backend Vercel
+async function loadLikesViews() {
+    try {
+        const response = await fetch(`${PODCAST_API_CONFIG.BASE_URL}${PODCAST_API_CONFIG.ENDPOINT}`);
+        if (response.ok) {
+            const stats = await response.json();
+            Object.entries(stats).forEach(([episodeId, data]) => {
+                const likesEl = document.getElementById(`likes-${episodeId}`);
+                const viewsEl = document.getElementById(`views-${episodeId}`);
+                if (likesEl) likesEl.textContent = data.likes || 0;
+                if (viewsEl) viewsEl.textContent = data.views || 0;
+            });
+        }
+    } catch (error) {
+        console.error('Erreur chargement stats podcasts:', error);
+    }
+}
+
+// Incrémenter le nombre de vues
+async function incrementView(episodeId) {
+    try {
+        const response = await fetch(`${PODCAST_API_CONFIG.BASE_URL}${PODCAST_API_CONFIG.ENDPOINT}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ episodeId, action: 'view' })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const viewsEl = document.getElementById(`views-${episodeId}`);
+            if (viewsEl) viewsEl.textContent = data.views;
+        }
+    } catch (error) {
+        console.error('Erreur incrément vue:', error);
+    }
+}
+
+// Incrémenter le nombre de likes
+async function incrementLike(episodeId) {
+    try {
+        const response = await fetch(`${PODCAST_API_CONFIG.BASE_URL}${PODCAST_API_CONFIG.ENDPOINT}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ episodeId, action: 'like' })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const likesEl = document.getElementById(`likes-${episodeId}`);
+            if (likesEl) likesEl.textContent = data.likes;
+        }
+    } catch (error) {
+        console.error('Erreur incrément like:', error);
+    }
+}
