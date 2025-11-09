@@ -1,7 +1,7 @@
 // Podcast stats API: likes & views
 // Uses GitHub Gist for storage
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_TOKEN = process.env.PYQUAR_GITHUB_TOKEN || process.env.GITHUB_ADMIN_TOKEN || process.env.GITHUB_TOKEN;
 const GIST_ID = '403a285df15c8e9d8b33058a63ae9c20';
 const GIST_FILENAME = 'podcast_stats.json';
 const GIST_API = `https://api.github.com/gists/${GIST_ID}`;
