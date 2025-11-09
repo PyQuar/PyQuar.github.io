@@ -8,10 +8,25 @@ const GIST_API = `https://api.github.com/gists/${GIST_ID}`;
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Enable CORS for all origins
+  const allowedOrigins = [
+    'https://pyquar.github.io',
+    'https://wavyessai.me',
+    'http://localhost:5500',
+    'http://localhost:3000',
+    'http://127.0.0.1:5500'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
