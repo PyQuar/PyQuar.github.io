@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musique - Wavy Essai Press Club</title>
+    <link rel="icon" type="image/png" href="assets/clublogo.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/music.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="music-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo-link">
+                <div class="nav-logo">
+                    <img src="assets/clublogo.png" alt="Wavy Essai Logo">
+                    <span>WAVY ESSAI</span>
+                </div>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="papers.html" class="nav-link">Papers</a></li>
+                <li><a href="podcasts.html" class="nav-link">Podcasts</a></li>
+                <li><a href="music.html" class="nav-link active">Musique</a></li>
+                <li><a href="game.html" class="nav-link">Word Wave</a></li>
+                <li><a href="register.html" class="nav-link">Essai League</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Spotify Player -->
+    <section class="music-hero">
+        <div class="hero-content">
+            <div class="music-badge">
+                <i class="fas fa-music"></i>
+                <span>EN DIRECT</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="gradient-text">Musique du Campus</span>
+            </h1>
+            <p class="hero-subtitle">La playlist officielle jouée dans les heures creuses</p>
+        </div>
+
+        <!-- Spotify Player Embed -->
+        <div class="spotify-container">
+            <iframe 
+                style="border-radius:12px" 
+                src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0" 
+                width="100%" 
+                height="380" 
+                frameBorder="0" 
+                allowfullscreen="" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+            </iframe>
+            <p class="spotify-note">
+                <i class="fab fa-spotify"></i>
+                Remplacez l'URL ci-dessus avec votre playlist Spotify
+            </p>
+        </div>
+    </section>
+
+    <!-- Suggestions Section -->
+    <section class="suggestions-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Suggérer une Musique
+                </h2>
+                <p class="section-description">
+                    Propose tes morceaux préférés pour enrichir notre playlist !
+                </p>
+            </div>
+
+            <!-- Suggestion Form -->
+            <div class="suggestion-form-card">
+                <form id="suggestionForm">
+                    <div class="form-group">
+                        <label for="songTitle">
+                            <i class="fas fa-music"></i>
+                            Titre de la chanson *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="songTitle" 
+                            placeholder="Ex: Blinding Lights" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="artistName">
+                            <i class="fas fa-microphone"></i>
+                            Artiste *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="artistName" 
+                            placeholder="Ex: The Weeknd" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="spotifyLink">
+                            <i class="fab fa-spotify"></i>
+                            Lien Spotify (optionnel)
+                        </label>
+                        <input 
+                            type="url" 
+                            id="spotifyLink" 
+                            placeholder="https://open.spotify.com/track/..."
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="suggestedBy">
+                            <i class="fas fa-user"></i>
+                            Ton nom *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="suggestedBy" 
+                            placeholder="Ex: Alex" 
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Envoyer ma suggestion</span>
+                    </button>
+                </form>
+
+                <div id="formMessage" class="form-message"></div>
+            </div>
+
+            <!-- Recent Suggestions -->
+            <div class="recent-suggestions">
+                <h3 class="suggestions-title">
+                    <i class="fas fa-clock"></i>
+                    Dernières Suggestions
+                    <span class="suggestions-count" id="suggestionsCount">0</span>
+                </h3>
+
+                <div id="suggestionsList" class="suggestions-grid">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Chargement...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>À Propos</h3>
+                    <p>Club de presse étudiant dédié à la créativité et l'innovation.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Liens Rapides</h3>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="podcasts.html">Podcasts</a></li>
+                        <li><a href="music.html">Musique</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: contact@wavyessai.me</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Wavy Essai Press Club. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/music.js"></script>
+</body>
+</html>

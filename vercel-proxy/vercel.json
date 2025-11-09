@@ -12,10 +12,13 @@
     {
       "src": "api/register-tournament.js",
       "use": "@vercel/node"
-    }
-    ,
+    },
     {
       "src": "api/podcast-stats.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/music-suggestions.js",
       "use": "@vercel/node"
     }
   ],
@@ -31,11 +34,14 @@
     {
       "src": "/api/register-tournament",
       "dest": "/api/register-tournament.js"
-    }
-    ,
+    },
     {
       "src": "/api/podcast-stats",
       "dest": "/api/podcast-stats.js"
+    },
+    {
+      "src": "/api/music-suggestions",
+      "dest": "/api/music-suggestions.js"
     }
   ]
 }
