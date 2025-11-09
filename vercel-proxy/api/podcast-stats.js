@@ -1,15 +1,8 @@
 // Podcast stats API: likes & views
 // Uses GitHub Gist for storage
 
-const GITHUB_TOKEN = process.env.PYQUAR_GITHUB_TOKEN || process.env.GITHUB_ADMIN_TOKEN || process.env.GITHUB_TOKEN;
-const GIST_ID = '403a285df15c8e9d8b33058a63ae9c20';
-const GIST_FILENAME = 'podcast_stats.json';
-const GIST_API = `https://api.github.com/gists/${GIST_ID}`;
-
-const fetch = require('node-fetch');
-
-module.exports = async (req, res) => {
-  // Enable CORS for all origins
+export default async function handler(req, res) {
+  // Enable CORS
   const allowedOrigins = [
     'https://pyquar.github.io',
     'https://wavyessai.me',
@@ -29,9 +22,18 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Max-Age', '86400');
 
+  // Handle preflight request
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
+  }
+
+  const GIST_ID = '403a285df15c8e9d8b33058a63ae9c20';
+  const GIST_FILENAME = 'podcast_stats.json';
+  const GITHUB_TOKEN = process.env.PYQUAR_GITHUB_TOKEN || process.env.GITHUB_ADMIN_TOKEN;
+  const GIST_API = `https://api.github.com/gists/${GIST_ID}`;
+
+  if (!GITHUB_TOKEN) {
+    return res.status(500).json({ error: 'Server configuration error: Missing GitHub token' });
   }
 
   if (!GITHUB_TOKEN) {

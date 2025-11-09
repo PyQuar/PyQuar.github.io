@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Music</title>
+</head>
+<body>
+    <h1>Test API Music Suggestions</h1>
+    <button onclick="testGet()">Test GET</button>
+    <button onclick="testPost()">Test POST</button>
+    <pre id="result"></pre>
+
+    <script>
+        const API_URL = 'https://word-wave-auth-proxy.vercel.app/api/music-suggestions';
+        
+        async function testGet() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing GET...';
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                result.textContent = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testPost() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing POST...';
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        songTitle: 'Test Song',
+                        artistName: 'Test Artist',
+                        suggestedBy: 'Tester',
+                        timestamp: Date.now(),
+                        date: new Date().toISOString()
+                    })
+                });
+                const data = await response.json();
+                result.textContent = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
