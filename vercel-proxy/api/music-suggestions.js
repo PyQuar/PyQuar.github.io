@@ -42,11 +42,19 @@ module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
       const gistRes = await fetch(GIST_API, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        headers: { 
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
       });
+      
+      if (!gistRes.ok) {
+        throw new Error(`GitHub API error: ${gistRes.status}`);
+      }
+      
       const gist = await gistRes.json();
-      const file = gist.files[GIST_FILENAME];
-      const suggestions = file ? JSON.parse(file.content) : [];
+      const content = gist.files[GIST_FILENAME]?.content || '[]';
+      const suggestions = JSON.parse(content);
       res.status(200).json(suggestions);
     } catch (err) {
       console.error('GET error:', err);
@@ -67,11 +75,19 @@ module.exports = async (req, res) => {
 
       // Get current suggestions
       const gistRes = await fetch(GIST_API, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        headers: { 
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
       });
+      
+      if (!gistRes.ok) {
+        throw new Error('Failed to fetch gist');
+      }
+      
       const gist = await gistRes.json();
-      const file = gist.files[GIST_FILENAME];
-      let suggestions = file ? JSON.parse(file.content) : [];
+      const content = gist.files[GIST_FILENAME]?.content || '[]';
+      let suggestions = JSON.parse(content);
 
       // Add new suggestion
       const newSuggestion = {
@@ -91,7 +107,8 @@ module.exports = async (req, res) => {
         method: 'PATCH',
         headers: {
           'Authorization': `token ${GITHUB_TOKEN}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify({
           files: {

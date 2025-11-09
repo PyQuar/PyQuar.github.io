@@ -43,14 +43,23 @@ module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
       const gistRes = await fetch(GIST_API, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        headers: { 
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
       });
+      
+      if (!gistRes.ok) {
+        throw new Error(`GitHub API error: ${gistRes.status}`);
+      }
+      
       const gist = await gistRes.json();
-      const file = gist.files[GIST_FILENAME];
-      const stats = file ? JSON.parse(file.content) : {};
+      const content = gist.files[GIST_FILENAME]?.content || '{}';
+      const stats = JSON.parse(content);
       res.status(200).json(stats);
     } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch stats', details: err });
+      console.error('GET error:', err);
+      res.status(500).json({ error: 'Failed to fetch stats', details: err.message });
     }
     return;
   }
@@ -65,7 +74,10 @@ module.exports = async (req, res) => {
       }
       // Get current stats
       const gistRes = await fetch(GIST_API, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        headers: { 
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
       });
       const gist = await gistRes.json();
       const file = gist.files[GIST_FILENAME];
@@ -78,7 +90,8 @@ module.exports = async (req, res) => {
         method: 'PATCH',
         headers: {
           'Authorization': `token ${GITHUB_TOKEN}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify({
           files: {
