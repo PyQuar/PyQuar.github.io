@@ -189,7 +189,7 @@ function createGuestCard(guest) {
 
             <div class="guest-details">
                 <span class="guest-badge people">
-                    <i class="fas fa-users"></i> ${guest.guests} personne${guest.guests > 1 ? 's' : ''}
+                    <i class="fas fa-users"></i> ${guest.guests || 1} personne${(guest.guests || 1) > 1 ? 's' : ''}
                 </span>
                 ${contributionText ? `
                     <span class="guest-badge contribution">
@@ -209,7 +209,10 @@ function createGuestCard(guest) {
 
 function updateStats() {
     const totalGuestsEl = document.getElementById('totalGuests');
-    if (totalGuestsEl) totalGuestsEl.textContent = guests.length;
+    if (totalGuestsEl) {
+        const count = Array.isArray(guests) ? guests.length : 0;
+        totalGuestsEl.textContent = isNaN(count) ? 0 : count;
+    }
 }
 
 // ===== EXPORT =====

@@ -786,6 +786,9 @@
     font-family: var(--font-kufi);
     font-size: 2.5rem;
     color: var(--ramadan-light-gold);
+    -webkit-text-fill-color: var(--ramadan-light-gold);
+    -webkit-background-clip: unset;
+    background: none;
     margin-bottom: 0.25rem;
 }
 
