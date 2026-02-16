@@ -21,9 +21,15 @@ chakanForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Inscription en cours...</span>';
 
-    // Gather dietary preferences
+    // Gather dietary preferences (if the field exists)
     const dietCheckboxes = document.querySelectorAll('input[name="diet"]:checked');
     const dietPreferences = Array.from(dietCheckboxes).map(cb => cb.value);
+
+    // Safely get optional fields
+    const guestsEl = document.getElementById('guests');
+    const allergiesEl = document.getElementById('allergies');
+    const contributionEl = document.getElementById('contribution');
+    const messageEl = document.getElementById('message');
 
     // Build form data
     const formData = {
@@ -31,11 +37,11 @@ chakanForm.addEventListener('submit', async (e) => {
         lastName: document.getElementById('lastName').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         email: document.getElementById('email').value.trim() || 'Non fourni',
-        guests: parseInt(document.getElementById('guests').value) || 1,
+        guests: guestsEl ? (parseInt(guestsEl.value) || 1) : 1,
         dietPreferences: dietPreferences.length > 0 ? dietPreferences : ['normal'],
-        allergies: document.getElementById('allergies').value.trim() || '',
-        contribution: document.getElementById('contribution').value,
-        message: document.getElementById('message').value.trim() || '',
+        allergies: allergiesEl ? allergiesEl.value.trim() : '',
+        contribution: contributionEl ? contributionEl.value : 'non',
+        message: messageEl ? messageEl.value.trim() : '',
         registrationDate: new Date().toISOString(),
         timestamp: Date.now()
     };

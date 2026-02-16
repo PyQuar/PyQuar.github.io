@@ -20,6 +20,10 @@
     {
       "src": "api/music-suggestions.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/register-chakan-fater.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -42,6 +46,10 @@
     {
       "src": "/api/music-suggestions",
       "dest": "/api/music-suggestions.js"
+    },
+    {
+      "src": "/api/register-chakan-fater",
+      "dest": "/api/register-chakan-fater.js"
     }
   ]
 }
