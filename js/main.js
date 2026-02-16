@@ -102,9 +102,11 @@ const observer = new IntersectionObserver((entries) => {
             entry.target.style.transform = 'translateY(0)';
             
             // Trigger counter animation for stat cards
-            if (entry.target.classList.contains('stat-number')) {
+            if (entry.target.classList.contains('stat-number') && !entry.target.hasAttribute('data-no-animate')) {
                 const target = parseInt(entry.target.getAttribute('data-target'));
-                animateCounter(entry.target, target);
+                if (!isNaN(target)) {
+                    animateCounter(entry.target, target);
+                }
                 observer.unobserve(entry.target);
             }
         }
