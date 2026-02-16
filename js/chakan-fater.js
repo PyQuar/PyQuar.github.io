@@ -14,6 +14,7 @@ const chakanForm = document.getElementById('chakanForm');
 const submitBtn = document.getElementById('submitBtn');
 const formMessage = document.getElementById('formMessage');
 
+if (chakanForm) {
 chakanForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -25,7 +26,11 @@ chakanForm.addEventListener('submit', async (e) => {
     const dietCheckboxes = document.querySelectorAll('input[name="diet"]:checked');
     const dietPreferences = Array.from(dietCheckboxes).map(cb => cb.value);
 
-    // Safely get optional fields
+    // Safely get all fields
+    const firstNameEl = document.getElementById('firstName');
+    const lastNameEl = document.getElementById('lastName');
+    const phoneEl = document.getElementById('phone');
+    const emailEl = document.getElementById('email');
     const guestsEl = document.getElementById('guests');
     const allergiesEl = document.getElementById('allergies');
     const contributionEl = document.getElementById('contribution');
@@ -33,10 +38,10 @@ chakanForm.addEventListener('submit', async (e) => {
 
     // Build form data
     const formData = {
-        firstName: document.getElementById('firstName').value.trim(),
-        lastName: document.getElementById('lastName').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        email: document.getElementById('email').value.trim() || 'Non fourni',
+        firstName: firstNameEl ? firstNameEl.value.trim() : '',
+        lastName: lastNameEl ? lastNameEl.value.trim() : '',
+        phone: phoneEl ? phoneEl.value.trim() : '',
+        email: emailEl ? emailEl.value.trim() || 'Non fourni' : 'Non fourni',
         guests: guestsEl ? (parseInt(guestsEl.value) || 1) : 1,
         dietPreferences: dietPreferences.length > 0 ? dietPreferences : ['normal'],
         allergies: allergiesEl ? allergiesEl.value.trim() : '',
@@ -94,6 +99,7 @@ chakanForm.addEventListener('submit', async (e) => {
         resetButton();
     }
 });
+} // end if (chakanForm)
 
 function resetButton() {
     submitBtn.disabled = false;
