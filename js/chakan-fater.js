@@ -209,12 +209,7 @@ function createGuestCard(guest) {
 
 function updateStats() {
     const totalGuestsEl = document.getElementById('totalGuests');
-    const totalPeopleEl = document.getElementById('totalPeople');
-    const totalContributorsEl = document.getElementById('totalContributors');
-
     if (totalGuestsEl) totalGuestsEl.textContent = guests.length;
-    if (totalPeopleEl) totalPeopleEl.textContent = guests.reduce((sum, g) => sum + (g.guests || 1), 0);
-    if (totalContributorsEl) totalContributorsEl.textContent = guests.filter(g => g.contribution && g.contribution !== 'non').length;
 }
 
 // ===== EXPORT =====
