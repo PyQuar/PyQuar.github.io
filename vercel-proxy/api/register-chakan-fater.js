@@ -102,6 +102,13 @@ export default async function handler(req, res) {
         });
       }
 
+      // Capture IP address
+      const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+        || req.headers['x-real-ip']
+        || req.socket?.remoteAddress
+        || 'unknown';
+      newGuest.ip = ip;
+
       // Add new guest
       guests.push(newGuest);
 
