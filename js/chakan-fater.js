@@ -131,7 +131,10 @@ async function loadGuests() {
 
         if (response.ok) {
             const data = await response.json();
-            guests = data.guests || [];
+            guests = (data.guests || []).map(g => ({
+                ...g,
+                paid: g.paid !== undefined ? g.paid : 0
+            }));
             localStorage.setItem('chakan-fater-registrations', JSON.stringify(guests));
             console.log(`${guests.length} invités chargés depuis le serveur`);
         }

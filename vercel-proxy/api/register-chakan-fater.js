@@ -51,7 +51,31 @@ export default async function handler(req, res) {
 
       const gist = await response.json();
       const content = gist.files[FILENAME]?.content || '[]';
-      const guests = JSON.parse(content);
+      const rawGuests = JSON.parse(content);
+      const guests = rawGuests.map(g => ({
+        ...g,
+        paid: g.paid !== undefined ? g.paid : 0
+      }));
+
+      // Persist normalization if any guest was missing the paid field
+      const needsUpdate = rawGuests.some(g => g.paid === undefined);
+      if (needsUpdate) {
+        await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `token ${ADMIN_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            files: {
+              [FILENAME]: {
+                content: JSON.stringify(guests, null, 2)
+              }
+            }
+          })
+        });
+      }
 
       return res.status(200).json({
         success: true,
