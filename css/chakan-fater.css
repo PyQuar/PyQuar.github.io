@@ -800,6 +800,20 @@
     letter-spacing: 1px;
 }
 
+.stat-card-paid {
+    border-color: rgba(46, 139, 87, 0.4);
+    background: linear-gradient(135deg, #0d2e1a 0%, #1a4a2e 100%) !important;
+}
+
+.stat-card-paid i {
+    color: #5ddb8e;
+}
+
+.stat-card-paid .stat-number {
+    color: #5ddb8e !important;
+    -webkit-text-fill-color: #5ddb8e !important;
+}
+
 /* ===== GUESTS GRID ===== */
 .guests-grid {
     display: grid;
@@ -834,6 +848,32 @@
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
     border-color: var(--ramadan-gold);
+}
+
+/* Paid guest card — green hue */
+.guest-card.guest-paid {
+    border-color: rgba(46, 139, 87, 0.35);
+    background: linear-gradient(135deg, #f0faf4 0%, #ffffff 100%);
+    box-shadow: 0 2px 12px rgba(46, 139, 87, 0.1);
+}
+
+.guest-card.guest-paid::before {
+    background: linear-gradient(90deg, #2e8b57, #3cb371, var(--ramadan-gold), #3cb371, #2e8b57);
+}
+
+.guest-card.guest-paid:hover {
+    border-color: #2e8b57;
+    box-shadow: 0 8px 24px rgba(46, 139, 87, 0.2);
+}
+
+.guest-avatar.avatar-paid {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    box-shadow: 0 2px 8px rgba(46, 139, 87, 0.3);
+}
+
+.paid-indicator {
+    font-size: 0.85rem;
+    margin-left: 0.3rem;
 }
 
 .guest-header {
@@ -894,6 +934,18 @@
     background: rgba(212, 160, 23, 0.1);
     color: var(--ramadan-warm-gold);
     border: 1px solid rgba(212, 160, 23, 0.2);
+}
+
+.guest-badge.paid-badge {
+    background: rgba(46, 139, 87, 0.12);
+    color: #2e8b57;
+    border: 1px solid rgba(46, 139, 87, 0.25);
+}
+
+.guest-badge.unpaid-badge {
+    background: rgba(160, 51, 44, 0.08);
+    color: #a0332c;
+    border: 1px solid rgba(160, 51, 44, 0.2);
 }
 
 .guest-message {

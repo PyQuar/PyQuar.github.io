@@ -166,6 +166,7 @@ function displayGuests() {
 
 function createGuestCard(guest) {
     const initials = `${(guest.firstName || '?')[0]}${(guest.lastName || '?')[0]}`.toUpperCase();
+    const isPaid = guest.paid === 1;
 
     const contributionLabels = {
         'non': '',
@@ -178,11 +179,11 @@ function createGuestCard(guest) {
     const contributionText = contributionLabels[guest.contribution] || '';
 
     return `
-        <div class="guest-card">
+        <div class="guest-card${isPaid ? ' guest-paid' : ''}">
             <div class="guest-header">
-                <div class="guest-avatar">${initials}</div>
+                <div class="guest-avatar${isPaid ? ' avatar-paid' : ''}">${initials}</div>
                 <div class="guest-info">
-                    <h3>${guest.firstName} ${guest.lastName}</h3>
+                    <h3>${guest.firstName} ${guest.lastName}${isPaid ? ' <span class="paid-indicator" title="Payé">✅</span>' : ''}</h3>
                     <span class="guest-meta">${new Date(guest.registrationDate).toLocaleDateString('fr-FR')}</span>
                 </div>
             </div>
@@ -191,6 +192,15 @@ function createGuestCard(guest) {
                 <span class="guest-badge people">
                     <i class="fas fa-users"></i> ${guest.guests || 1} personne${(guest.guests || 1) > 1 ? 's' : ''}
                 </span>
+                ${isPaid ? `
+                    <span class="guest-badge paid-badge">
+                        <i class="fas fa-check-circle"></i> Payé
+                    </span>
+                ` : `
+                    <span class="guest-badge unpaid-badge">
+                        <i class="fas fa-times-circle"></i> Non payé
+                    </span>
+                `}
                 ${contributionText ? `
                     <span class="guest-badge contribution">
                         ${contributionText}
@@ -213,11 +223,17 @@ function updateStats() {
         const count = Array.isArray(guests) ? guests.length : 0;
         totalGuestsEl.textContent = isNaN(count) ? 0 : count;
     }
+
+    const totalPaidEl = document.getElementById('totalPaid');
+    if (totalPaidEl) {
+        const paidCount = Array.isArray(guests) ? guests.filter(g => g.paid === 1).length : 0;
+        totalPaidEl.textContent = paidCount;
+    }
 }
 
 // ===== EXPORT =====
 function exportChakanRegistrations() {
-    const headers = ['Prénom', 'Nom', 'Téléphone', 'Email', 'Nb Personnes', 'Régime', 'Allergies', 'Contribution', 'Message', 'Date'];
+    const headers = ['Prénom', 'Nom', 'Téléphone', 'Email', 'Nb Personnes', 'Régime', 'Allergies', 'Contribution', 'Message', 'Payé', 'Date'];
     const rows = guests.map(g => [
         g.firstName,
         g.lastName,
@@ -228,6 +244,7 @@ function exportChakanRegistrations() {
         g.allergies || '',
         g.contribution,
         g.message || '',
+        g.paid === 1 ? 'Oui' : 'Non',
         new Date(g.registrationDate).toLocaleString('fr-FR')
     ]);
 

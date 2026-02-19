@@ -109,6 +109,11 @@ export default async function handler(req, res) {
         || 'unknown';
       newGuest.ip = ip;
 
+      // Default paid status to 0 (not paid)
+      if (newGuest.paid === undefined) {
+        newGuest.paid = 0;
+      }
+
       // Add new guest
       guests.push(newGuest);
 
