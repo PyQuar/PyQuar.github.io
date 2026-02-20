@@ -84,6 +84,55 @@
         <div class="mosque-silhouette"></div>
     </section>
 
+    <!-- Countdown Timer Section -->
+    <section class="countdown-section">
+        <div class="container">
+            <div class="countdown-wrapper">
+                <div class="countdown-ornament-top">
+                    <span>☪</span>
+                    <div class="ornament-line"></div>
+                    <span>🏮</span>
+                    <div class="ornament-line"></div>
+                    <span>☪</span>
+                </div>
+                <h2 class="countdown-heading">
+                    <i class="fas fa-moon"></i> L'Iftar commence dans
+                </h2>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="countdown-unit">
+                        <div class="countdown-value" id="countDays">00</div>
+                        <div class="countdown-label">Jours</div>
+                    </div>
+                    <div class="countdown-separator">:</div>
+                    <div class="countdown-unit">
+                        <div class="countdown-value" id="countHours">00</div>
+                        <div class="countdown-label">Heures</div>
+                    </div>
+                    <div class="countdown-separator">:</div>
+                    <div class="countdown-unit">
+                        <div class="countdown-value" id="countMinutes">00</div>
+                        <div class="countdown-label">Minutes</div>
+                    </div>
+                    <div class="countdown-separator">:</div>
+                    <div class="countdown-unit">
+                        <div class="countdown-value" id="countSeconds">00</div>
+                        <div class="countdown-label">Secondes</div>
+                    </div>
+                </div>
+                <div class="countdown-event-info">
+                    <span class="countdown-date"><i class="fas fa-calendar-star"></i> 25 Février 2026 — 18h00</span>
+                </div>
+                <div class="countdown-ended" id="countdownEnded" style="display:none;">
+                    <h2>🌙 رمضان كريم 🌙</h2>
+                    <p>L'iftar a commencé — Bon appétit et Ramadan Moubarak !</p>
+                </div>
+                <div class="countdown-ornament-bottom">
+                    <span>✦</span><span>◆</span><span>✦</span><span>◆</span><span>✦</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Registration Form Section
     <section class="registration-section">
         <div class="container">
@@ -366,6 +415,48 @@
         <audio id="audioElement" preload="metadata"></audio>
     </div>
 
+    <script>
+    // Countdown to Feb 25, 2026 at 18:00 (local time)
+    (function() {
+        const targetDate = new Date('2026-02-25T18:00:00').getTime();
+        const daysEl = document.getElementById('countDays');
+        const hoursEl = document.getElementById('countHours');
+        const minutesEl = document.getElementById('countMinutes');
+        const secondsEl = document.getElementById('countSeconds');
+        const timerEl = document.getElementById('countdownTimer');
+        const endedEl = document.getElementById('countdownEnded');
+        const eventInfo = document.querySelector('.countdown-event-info');
+        const heading = document.querySelector('.countdown-heading');
+
+        function pad(n) { return n < 10 ? '0' + n : n; }
+
+        function updateCountdown() {
+            const now = Date.now();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                timerEl.style.display = 'none';
+                if (eventInfo) eventInfo.style.display = 'none';
+                if (heading) heading.style.display = 'none';
+                endedEl.style.display = 'block';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            daysEl.textContent = pad(days);
+            hoursEl.textContent = pad(hours);
+            minutesEl.textContent = pad(minutes);
+            secondsEl.textContent = pad(seconds);
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    })();
+    </script>
     <script src="js/persistent-audio.js?v=2"></script>
     <script src="js/main.js?v=2"></script>
     <script src="js/chakan-fater.js?v=4"></script>

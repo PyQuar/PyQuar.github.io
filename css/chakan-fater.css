@@ -56,6 +56,198 @@
     background: var(--ramadan-deep-purple);
 }
 
+/* ===== COUNTDOWN TIMER ===== */
+.countdown-section {
+    position: relative;
+    z-index: 1;
+    padding: 60px 0 40px;
+    background: linear-gradient(180deg, #0d1a3a 0%, var(--ramadan-deep-purple) 100%);
+}
+
+.countdown-wrapper {
+    max-width: 750px;
+    margin: 0 auto;
+    text-align: center;
+    background: rgba(45, 27, 78, 0.6);
+    border: 2px solid var(--ramadan-gold);
+    border-radius: 24px;
+    padding: 40px 30px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(212, 160, 23, 0.15), inset 0 0 60px rgba(212, 160, 23, 0.05);
+}
+
+.countdown-ornament-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 1.6rem;
+    color: var(--ramadan-gold);
+    filter: drop-shadow(0 0 6px rgba(212, 160, 23, 0.5));
+}
+
+.countdown-ornament-top .ornament-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ramadan-gold), transparent);
+}
+
+.countdown-heading {
+    font-family: var(--font-primary);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--ramadan-light-gold);
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+}
+
+.countdown-heading i {
+    margin-right: 8px;
+    color: var(--ramadan-gold);
+}
+
+.countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-value {
+    font-family: var(--font-kufi);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--white);
+    background: linear-gradient(145deg, rgba(212, 160, 23, 0.2), rgba(26, 10, 46, 0.8));
+    border: 2px solid rgba(212, 160, 23, 0.4);
+    border-radius: 16px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(212, 160, 23, 0.1);
+    text-shadow: 0 0 15px rgba(212, 160, 23, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-value::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+    border-radius: 14px 14px 0 0;
+}
+
+.countdown-separator {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--ramadan-gold);
+    text-shadow: 0 0 10px rgba(212, 160, 23, 0.5);
+    animation: separatorPulse 1s ease-in-out infinite;
+    padding-bottom: 25px;
+}
+
+@keyframes separatorPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.countdown-label {
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ramadan-warm-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 10px;
+}
+
+.countdown-event-info {
+    margin-top: 25px;
+}
+
+.countdown-date {
+    font-family: var(--font-primary);
+    font-size: 0.95rem;
+    color: var(--ramadan-cream);
+    background: rgba(212, 160, 23, 0.15);
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 160, 23, 0.3);
+}
+
+.countdown-date i {
+    margin-right: 6px;
+    color: var(--ramadan-gold);
+}
+
+.countdown-ended {
+    padding: 20px;
+}
+
+.countdown-ended h2 {
+    font-family: var(--font-arabic);
+    font-size: 2.5rem;
+    color: var(--ramadan-light-gold);
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(212, 160, 23, 0.5);
+}
+
+.countdown-ended p {
+    font-family: var(--font-primary);
+    font-size: 1.1rem;
+    color: var(--ramadan-cream);
+}
+
+.countdown-ornament-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: var(--ramadan-gold);
+    opacity: 0.5;
+}
+
+@media (max-width: 600px) {
+    .countdown-wrapper {
+        padding: 30px 15px;
+    }
+    .countdown-value {
+        font-size: 2.2rem;
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+    }
+    .countdown-separator {
+        font-size: 1.8rem;
+        padding-bottom: 20px;
+    }
+    .countdown-heading {
+        font-size: 1.1rem;
+    }
+    .countdown-timer {
+        gap: 6px;
+    }
+    .countdown-label {
+        font-size: 0.65rem;
+    }
+}
+
 /* ===== FLOATING LANTERNS ===== */
 .lanterns-bg {
     position: fixed;
