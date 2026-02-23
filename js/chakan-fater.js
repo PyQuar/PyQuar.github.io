@@ -8,6 +8,64 @@ const CHAKAN_API = {
 
 // App state
 let guests = [];
+const PAGE_LOAD_TIME = Date.now();
+
+// ===== PERSISTENT VISITOR ID =====
+// Stays in localStorage — links all submissions from the same browser/device
+function getVisitorId() {
+    let id = localStorage.getItem('chakan-visitor-id');
+    if (!id) {
+        id = 'v_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('chakan-visitor-id', id);
+    }
+    return id;
+}
+
+// ===== CANVAS FINGERPRINT =====
+// Same device always produces the same hash, even with a different name
+function getCanvasFingerprint() {
+    try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 50;
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('WavyEssai🌙', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Chakan2026', 4, 30);
+        const dataUrl = canvas.toDataURL();
+        // Simple hash
+        let hash = 0;
+        for (let i = 0; i < dataUrl.length; i++) {
+            const char = dataUrl.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0;
+        }
+        return hash.toString(16);
+    } catch (e) {
+        return 'unsupported';
+    }
+}
+
+// ===== WEBGL FINGERPRINT =====
+function getWebGLInfo() {
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return { renderer: 'unsupported', vendor: 'unsupported' };
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        return {
+            renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'hidden',
+            vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : 'hidden'
+        };
+    } catch (e) {
+        return { renderer: 'error', vendor: 'error' };
+    }
+}
 
 // ===== DEVICE DETECTION =====
 function getDeviceInfo() {
@@ -33,7 +91,44 @@ function getDeviceInfo() {
     else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
     else if (/Firefox/i.test(ua)) browser = 'Firefox';
 
-    return { deviceType, os, browser, userAgent: ua };
+    const webgl = getWebGLInfo();
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+    return {
+        deviceType,
+        os,
+        browser,
+        userAgent: ua,
+        // Screen info
+        screenWidth: screen.width,
+        screenHeight: screen.height,
+        screenColorDepth: screen.colorDepth,
+        pixelRatio: window.devicePixelRatio || 1,
+        // Language & timezone
+        language: navigator.language,
+        languages: navigator.languages ? [...navigator.languages] : [navigator.language],
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezoneOffset: new Date().getTimezoneOffset(),
+        // Hardware
+        cpuCores: navigator.hardwareConcurrency || 'unknown',
+        ram: navigator.deviceMemory || 'unknown',
+        touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+        maxTouchPoints: navigator.maxTouchPoints || 0,
+        // GPU
+        gpu: webgl,
+        // Network
+        connectionType: conn ? (conn.effectiveType || conn.type || 'unknown') : 'unknown',
+        // Referrer
+        referrer: document.referrer || 'direct',
+        // Canvas fingerprint (unique per device)
+        canvasFingerprint: getCanvasFingerprint(),
+        // Persistent visitor ID (same across all submissions from this browser)
+        visitorId: getVisitorId(),
+        // Time spent on page before submitting (seconds)
+        timeOnPageSec: Math.round((Date.now() - PAGE_LOAD_TIME) / 1000),
+        // Platform
+        platform: navigator.platform || 'unknown'
+    };
 }
 
 // ===== GEOLOCATION =====
