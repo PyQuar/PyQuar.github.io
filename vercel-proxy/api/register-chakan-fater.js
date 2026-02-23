@@ -133,6 +133,9 @@ export default async function handler(req, res) {
         || 'unknown';
       newGuest.ip = ip;
 
+      // Preserve device & location info sent from client
+      // newGuest.device and newGuest.location are already in the body
+
       // Default paid status to 0 (not paid)
       if (newGuest.paid === undefined) {
         newGuest.paid = 0;

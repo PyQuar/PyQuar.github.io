@@ -9,6 +9,56 @@ const CHAKAN_API = {
 // App state
 let guests = [];
 
+// ===== DEVICE DETECTION =====
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let deviceType = 'Desktop';
+    if (/Mobi|Android.*Mobile|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+        deviceType = 'Mobile';
+    } else if (/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) {
+        deviceType = 'Tablet';
+    }
+
+    let os = 'Unknown';
+    if (/Windows/i.test(ua)) os = 'Windows';
+    else if (/Mac OS|Macintosh/i.test(ua)) os = 'macOS';
+    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+    else if (/Android/i.test(ua)) os = 'Android';
+    else if (/Linux/i.test(ua)) os = 'Linux';
+
+    let browser = 'Unknown';
+    if (/Edg\//i.test(ua)) browser = 'Edge';
+    else if (/OPR|Opera/i.test(ua)) browser = 'Opera';
+    else if (/Chrome/i.test(ua)) browser = 'Chrome';
+    else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+    else if (/Firefox/i.test(ua)) browser = 'Firefox';
+
+    return { deviceType, os, browser, userAgent: ua };
+}
+
+// ===== GEOLOCATION =====
+function getUserLocation() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve({ latitude: null, longitude: null, locationError: 'Geolocation not supported' });
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                });
+            },
+            (error) => {
+                resolve({ latitude: null, longitude: null, locationError: error.message });
+            },
+            { timeout: 5000, maximumAge: 60000 }
+        );
+    });
+}
+
 // ===== FORM SUBMISSION =====
 const chakanForm = document.getElementById('chakanForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -36,6 +86,10 @@ chakanForm.addEventListener('submit', async (e) => {
     const contributionEl = document.getElementById('contribution');
     const messageEl = document.getElementById('message');
 
+    // Collect device info & location in parallel
+    const deviceInfo = getDeviceInfo();
+    const locationInfo = await getUserLocation();
+
     // Build form data
     const formData = {
         firstName: firstNameEl ? firstNameEl.value.trim() : '',
@@ -48,7 +102,9 @@ chakanForm.addEventListener('submit', async (e) => {
         contribution: contributionEl ? contributionEl.value : 'non',
         message: messageEl ? messageEl.value.trim() : '',
         registrationDate: new Date().toISOString(),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        device: deviceInfo,
+        location: locationInfo
     };
 
     // Validate
