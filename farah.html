@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>To My Farah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6efe1;
+    --paper-shadow: #e8dcc4;
+    --ink: #3b3226;
+    --ink-soft: #5c5142;
+    --accent: #9c6b4f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #2a2118 0%, #17130e 65%, #0d0b08 100%);
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .letter-wrap {
+    width: 100%;
+    max-width: 720px;
+    position: relative;
+  }
+
+  .letter {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0) 8%),
+      var(--paper);
+    background-color: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.04),
+      0 25px 60px rgba(0,0,0,0.55),
+      inset 0 0 80px rgba(156, 107, 79, 0.08);
+    border-radius: 3px;
+    padding: 56px 48px 48px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: riseIn 1.4s ease forwards 0.2s;
+  }
+
+  .letter::before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(156, 107, 79, 0.35);
+    pointer-events: none;
+  }
+
+  @keyframes riseIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .heading {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+
+  .heading .to {
+    font-size: 1.05rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .heading h1 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 3rem;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .date {
+    text-align: right;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  .salutation {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 22px;
+  }
+
+  .body-text p {
+    font-size: 1.28rem;
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: 20px;
+    text-align: justify;
+  }
+
+  .body-text .drop {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 0;
+    position: relative;
+    top: 12px;
+    margin-right: 4px;
+  }
+
+  .memories {
+    margin: 28px 0 30px;
+    padding: 18px 22px;
+    border-left: 3px solid var(--accent);
+    background: rgba(156, 107, 79, 0.06);
+  }
+
+  .memories li {
+    list-style: none;
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .memories li::before {
+    content: "❧ ";
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .closing {
+    margin-top: 36px;
+  }
+
+  .closing p {
+    font-size: 1.28rem;
+    line-height: 1.8;
+    margin-bottom: 18px;
+  }
+
+  .signoff {
+    margin-top: 10px;
+  }
+
+  .signoff .line {
+    font-size: 1.28rem;
+    margin-bottom: 6px;
+  }
+
+  .signoff .name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stamp {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    width: 64px;
+    height: 78px;
+    border: 2px dashed rgba(156, 107, 79, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    transform: rotate(4deg);
+    opacity: 0.75;
+  }
+
+  .quote {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    margin-top: 38px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(156, 107, 79, 0.3);
+  }
+
+  @media (max-width: 560px) {
+    .letter { padding: 40px 24px 32px; }
+    .heading h1 { font-size: 2.3rem; }
+    .salutation { font-size: 1.7rem; }
+    .body-text p, .closing p { font-size: 1.12rem; }
+    .stamp { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="letter-wrap">
+  <div class="letter">
+    <div class="stamp">HAPPY<br>BIRTHDAY</div>
+
+    <div class="heading">
+      <div class="to">A Letter To</div>
+      <h1>My Juliet, Farah</h1>
+    </div>
+
+    <div class="date">Verona of my heart &mdash; August 4th</div>
+
+    <div class="salutation">My dearest Farah,</div>
+
+    <div class="body-text">
+      <p><span class="drop">I</span>f Juliet had a wall in Verona where strangers left her their hearts on paper, then let this page be my wall, and you the only one I have ever wanted to write to. Twenty-three years ago today, the world got its best idea yet. So before anything else &mdash; happy birthday, my love.</p>
+
+      <p>I keep thinking about how easy it is to love you in the small, ordinary moments, the ones nobody would think to put in a movie. So today I wanted to write a few of them down, the way Sophie collected letters that had waited fifty years to be answered &mdash; except I don't want to wait. I want to tell you now, while it's still today, while it's still your day.</p>
+    </div>
+
+    <ul class="memories">
+      <li>The way you play rondo like you invented it &mdash; always one step ahead, laughing every time the ball finds you again.</li>
+      <li>Our kayak drifting further than either of us planned, both of us pretending we knew where we were going.</li>
+      <li>Me, standing in the heaviest rain of the year, eating ice cream like it was the most reasonable decision in the world, just to make you laugh.</li>
+      <li>The night we watched Letters to Juliet together, apart in two different homes, and somehow it still felt like the same room.</li>
+    </ul>
+
+    <div class="body-text">
+      <p>That's the part of us I love most, Farah &mdash; that distance never really was distance. A screen, a few hundred kilometers, an ordinary Tuesday &mdash; none of it has ever been strong enough to make me feel far from you. If Claire could find her fifty-year-old love again, I figure I'm allowed to be a little bit hopeful about ours too.</p>
+    </div>
+
+    <div class="closing">
+      <p>So here is my letter, left for you the way Verona's wall keeps its promises: I am so glad it's your birthday. I am so glad it's you. Whatever this next year brings, I hope it's full of rondo mornings, reckless kayaks, ice cream in bad weather, and a hundred more movie nights &mdash; together in the same room, or in two, it never really mattered.</p>
+      <p>Happy birthday, my Juliet.</p>
+    </div>
+
+    <div class="signoff">
+      <div class="line">All my love, always,</div>
+      <div class="name">Yours</div>
+    </div>
+
+    <div class="quote">"Whatever, wherever, don't ever lose courage." &mdash; Letters to Juliet</div>
+  </div>
+</div>
+
+</body>
+</html>
