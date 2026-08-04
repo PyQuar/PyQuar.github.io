@@ -184,6 +184,92 @@
     color: var(--accent);
     transform: rotate(4deg);
     opacity: 0.75;
+    cursor: pointer;
+    animation: stampPulse 2.6s ease-in-out infinite;
+    transition: transform 0.25s ease;
+  }
+
+  .stamp:hover {
+    transform: rotate(4deg) scale(1.08);
+  }
+
+  @keyframes stampPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(156, 107, 79, 0); }
+    50% { box-shadow: 0 0 14px rgba(156, 107, 79, 0.5); }
+  }
+
+  /* Easter egg */
+  .petal {
+    position: fixed;
+    top: -8%;
+    pointer-events: none;
+    z-index: 998;
+    animation: petalFall linear forwards;
+  }
+
+  @keyframes petalFall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(115vh) translateX(var(--drift)) rotate(var(--spin)); opacity: 0.85; }
+  }
+
+  .bday-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 11, 8, 0.72);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .bday-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .bday-message {
+    transform: scale(0.7);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+  }
+
+  .bday-overlay.active .bday-message {
+    transform: scale(1);
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
+  .bday-message h2 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 3.2rem;
+    color: var(--paper);
+    margin-bottom: 12px;
+  }
+
+  .bday-message p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--paper-shadow);
+  }
+
+  .bday-hint {
+    margin-top: 28px;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  @media (max-width: 560px) {
+    .bday-message h2 { font-size: 2.2rem; }
+    .bday-message p { font-size: 1.05rem; }
   }
 
   .quote {
@@ -201,7 +287,7 @@
     .heading h1 { font-size: 2.3rem; }
     .salutation { font-size: 1.7rem; }
     .body-text p, .closing p { font-size: 1.12rem; }
-    .stamp { display: none; }
+    .stamp { width: 52px; height: 64px; font-size: 0.6rem; top: 18px; right: 18px; }
   }
 </style>
 </head>
@@ -250,6 +336,45 @@
     <div class="quote">"Whatever, wherever, don't ever lose courage." &mdash; Letters to Juliet</div>
   </div>
 </div>
+
+<div class="bday-overlay" id="bdayOverlay">
+  <div class="bday-message">
+    <h2>Happy Birthday, Farah! &#127881;</h2>
+    <p>My Juliet, today and always.</p>
+    <div class="bday-hint">tap anywhere to close</div>
+  </div>
+</div>
+
+<script>
+  const stamp = document.querySelector('.stamp');
+  const overlay = document.getElementById('bdayOverlay');
+  const EMOJIS = ['\u{1F339}', '✨', '\u{1F49B}', '\u{1F388}'];
+
+  function spawnPetals(count) {
+    for (let i = 0; i < count; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+      petal.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
+      petal.style.setProperty('--spin', (Math.random() * 720 - 360) + 'deg');
+      petal.style.animationDuration = (3 + Math.random() * 2.5) + 's';
+      petal.style.animationDelay = (Math.random() * 1.2) + 's';
+      document.body.appendChild(petal);
+      setTimeout(() => petal.remove(), 8000);
+    }
+  }
+
+  stamp.addEventListener('click', () => {
+    overlay.classList.add('active');
+    spawnPetals(45);
+  });
+
+  overlay.addEventListener('click', () => {
+    overlay.classList.remove('active');
+  });
+</script>
 
 </body>
 </html>
