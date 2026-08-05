@@ -650,6 +650,90 @@
     .bday-message p { font-size: 1.05rem; }
   }
 
+  /* Together-since counter (secret — the date line is the trigger, no visual hint) */
+  .counter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 11, 8, 0.72);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .counter-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .counter-card {
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  }
+
+  .counter-overlay.active .counter-card {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .counter-label {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+
+  .counter-days {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 3.6rem;
+    color: var(--paper);
+    line-height: 1;
+  }
+
+  .counter-days .unit {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-left: 8px;
+  }
+
+  .counter-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--paper-shadow);
+    font-size: 1.05rem;
+    margin-top: 10px;
+  }
+
+  .counter-since {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.95rem;
+    margin-top: 16px;
+  }
+
+  .counter-hint {
+    margin-top: 24px;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  @media (max-width: 560px) {
+    .counter-days { font-size: 2.6rem; }
+    .counter-label { font-size: 1.4rem; }
+  }
+
   .quote {
     text-align: center;
     font-style: italic;
@@ -699,7 +783,7 @@
       <h1>My Juliet, Farah</h1>
     </div>
 
-    <div class="date">Verona of my heart &mdash; August 4th</div>
+    <div class="date" id="dateTrigger">Verona of my heart &mdash; August 4th</div>
 
     <div class="salutation">My dearest Farah,</div>
 
@@ -1045,6 +1129,16 @@
   </div>
 </div>
 
+<div class="counter-overlay" id="counterOverlay">
+  <div class="counter-card">
+    <div class="counter-label">Together Since</div>
+    <div class="counter-days"><span id="counterDaysValue">0</span><span class="unit">days</span></div>
+    <div class="counter-sub" id="counterSub"></div>
+    <div class="counter-since">April 16, 2026</div>
+    <div class="counter-hint">tap anywhere to close</div>
+  </div>
+</div>
+
 <script>
   const stamp = document.querySelector('.stamp');
   const overlay = document.getElementById('bdayOverlay');
@@ -1185,6 +1279,39 @@
         shape.setAttribute('fill', '#ffffff');
         try { localStorage.removeItem(STORAGE_PREFIX + shape.id); } catch (err) {}
       });
+    });
+  }
+
+  const dateTrigger = document.getElementById('dateTrigger');
+  const counterOverlay = document.getElementById('counterOverlay');
+  if (dateTrigger && counterOverlay) {
+    const START_DATE = new Date('2026-04-16T00:00:00');
+    const daysValueEl = document.getElementById('counterDaysValue');
+    const counterSubEl = document.getElementById('counterSub');
+    let counterTimer = null;
+
+    function updateCounter() {
+      const totalSeconds = Math.max(0, Math.floor((Date.now() - START_DATE.getTime()) / 1000));
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      daysValueEl.textContent = days;
+      counterSubEl.textContent = 'and ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
+    }
+
+    dateTrigger.addEventListener('click', () => {
+      updateCounter();
+      counterTimer = setInterval(updateCounter, 1000);
+      counterOverlay.classList.add('active');
+    });
+
+    counterOverlay.addEventListener('click', () => {
+      counterOverlay.classList.remove('active');
+      if (counterTimer) {
+        clearInterval(counterTimer);
+        counterTimer = null;
+      }
     });
   }
 </script>
