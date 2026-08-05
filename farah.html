@@ -422,6 +422,160 @@
     opacity: 0.8;
   }
 
+  /* Coloring booklet (secret — no visual hint on the trigger) */
+  .booklet-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 11, 8, 0.78);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    padding: 20px;
+  }
+
+  .booklet-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .booklet-card {
+    background: var(--paper);
+    max-width: 460px;
+    width: 100%;
+    padding: 20px 20px 18px;
+    border-radius: 4px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.55);
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  }
+
+  .booklet-overlay.active .booklet-card {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .booklet-title {
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .booklet-viewport {
+    border-radius: 3px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(156, 107, 79, 0.25);
+  }
+
+  .coloring-page { display: none; width: 100%; height: auto; }
+  .coloring-page.active { display: block; }
+
+  .colorable {
+    cursor: pointer;
+    transition: fill 0.15s ease;
+  }
+
+  .palette {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 14px 0 4px;
+  }
+
+  .swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(59, 50, 38, 0.25);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .swatch.eraser {
+    background: #ffffff;
+  }
+
+  .swatch.selected {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--accent);
+  }
+
+  .booklet-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .booklet-arrow {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--accent);
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 10px;
+  }
+
+  .booklet-dots {
+    display: flex;
+    gap: 7px;
+  }
+
+  .booklet-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(156, 107, 79, 0.3);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+
+  .booklet-dot.active {
+    background: var(--accent);
+  }
+
+  .booklet-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    gap: 10px;
+  }
+
+  .booklet-reset {
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    padding: 0;
+  }
+
+  .booklet-hint {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
   /* Easter egg */
   .petal {
     position: fixed;
@@ -517,6 +671,8 @@
     .envelope-seal { top: 50px; width: 40px; height: 40px; font-size: 1.1rem; }
     .envelope-label { font-size: 1.35rem; bottom: -46px; }
     .envelope-hint { bottom: -72px; }
+    .swatch { width: 22px; height: 22px; }
+    .booklet-title { font-size: 1.35rem; }
   }
 </style>
 </head>
@@ -773,6 +929,122 @@
   </div>
 </div>
 
+<div class="booklet-overlay" id="bookletOverlay">
+  <div class="booklet-card">
+    <div class="booklet-title">Our Coloring Book</div>
+
+    <div class="palette" id="palette">
+      <button type="button" class="swatch" style="background:#e0693f" data-color="#e0693f" aria-label="coral"></button>
+      <button type="button" class="swatch" style="background:#f6d365" data-color="#f6d365" aria-label="yellow"></button>
+      <button type="button" class="swatch" style="background:#d9a441" data-color="#d9a441" aria-label="gold"></button>
+      <button type="button" class="swatch" style="background:#7c8f6a" data-color="#7c8f6a" aria-label="green"></button>
+      <button type="button" class="swatch" style="background:#1b8a94" data-color="#1b8a94" aria-label="teal"></button>
+      <button type="button" class="swatch" style="background:#3d6bc4" data-color="#3d6bc4" aria-label="blue"></button>
+      <button type="button" class="swatch" style="background:#8e5ca8" data-color="#8e5ca8" aria-label="purple"></button>
+      <button type="button" class="swatch" style="background:#e08fb0" data-color="#e08fb0" aria-label="pink"></button>
+      <button type="button" class="swatch" style="background:#5c4326" data-color="#5c4326" aria-label="brown"></button>
+      <button type="button" class="swatch eraser" data-color="#ffffff" aria-label="eraser"></button>
+    </div>
+
+    <div class="booklet-viewport">
+
+      <svg id="page-mountain" class="coloring-page active" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <rect id="mtn-sky" class="colorable" x="0" y="0" width="400" height="300" fill="#ffffff"/>
+        <circle id="mtn-sun" class="colorable" cx="338" cy="52" r="26" fill="#ffffff"/>
+        <path id="mtn-backMountain" class="colorable" d="M0 200 L70 95 L130 165 L190 65 L250 155 L310 85 L400 175 L400 300 L0 300 Z" fill="#ffffff"/>
+        <path id="mtn-frontMountain" class="colorable" d="M0 240 L90 135 L150 195 L200 105 L260 185 L330 125 L400 205 L400 300 L0 300 Z" fill="#ffffff"/>
+        <path id="mtn-flag" class="colorable" d="M200 105 L200 75 L222 84 L200 93 Z" fill="#ffffff"/>
+        <ellipse id="mtn-climber1" class="colorable" cx="150" cy="214" rx="15" ry="19" fill="#ffffff"/>
+        <ellipse id="mtn-climber2" class="colorable" cx="182" cy="184" rx="15" ry="19" fill="#ffffff"/>
+        <g fill="none" stroke="#2a2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M0 200 L70 95 L130 165 L190 65 L250 155 L310 85 L400 175"/>
+          <path d="M0 240 L90 135 L150 195 L200 105 L260 185 L330 125 L400 205"/>
+          <path d="M200 105 L200 75 L222 84 L200 93 Z"/>
+          <circle cx="338" cy="52" r="26"/>
+          <circle cx="150" cy="197" r="13"/>
+          <circle cx="182" cy="167" r="13"/>
+          <path d="M150 205 Q166 193 182 179" stroke-width="3" stroke-dasharray="2 8"/>
+        </g>
+      </svg>
+
+      <svg id="page-kayak" class="coloring-page" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <rect id="kay-sky" class="colorable" x="0" y="0" width="400" height="150" fill="#ffffff"/>
+        <circle id="kay-sun" class="colorable" cx="335" cy="55" r="24" fill="#ffffff"/>
+        <rect id="kay-water" class="colorable" x="0" y="150" width="400" height="150" fill="#ffffff"/>
+        <ellipse id="kay-boat" class="colorable" cx="200" cy="195" rx="120" ry="20" fill="#ffffff"/>
+        <ellipse id="kay-rider1" class="colorable" cx="170" cy="178" rx="16" ry="18" fill="#ffffff"/>
+        <ellipse id="kay-rider2" class="colorable" cx="230" cy="178" rx="16" ry="18" fill="#ffffff"/>
+        <g fill="none" stroke="#2a2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <line x1="0" y1="150" x2="400" y2="150"/>
+          <circle cx="335" cy="55" r="24"/>
+          <ellipse cx="200" cy="195" rx="120" ry="20"/>
+          <circle cx="170" cy="160" r="13"/>
+          <circle cx="230" cy="160" r="13"/>
+          <line x1="146" y1="188" x2="194" y2="168"/>
+          <line x1="206" y1="168" x2="254" y2="188"/>
+        </g>
+      </svg>
+
+      <svg id="page-busstop" class="coloring-page" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <rect id="bus-sky" class="colorable" x="0" y="0" width="400" height="300" fill="#ffffff"/>
+        <rect id="bus-roof" class="colorable" x="90" y="100" width="220" height="22" rx="4" fill="#ffffff"/>
+        <rect id="bus-glass" class="colorable" x="110" y="122" width="180" height="110" fill="#ffffff"/>
+        <rect id="bus-sign" class="colorable" x="315" y="95" width="42" height="30" rx="4" fill="#ffffff"/>
+        <ellipse id="bus-person1" class="colorable" cx="175" cy="210" rx="16" ry="20" fill="#ffffff"/>
+        <ellipse id="bus-person2" class="colorable" cx="225" cy="210" rx="16" ry="20" fill="#ffffff"/>
+        <circle id="bus-scoop1" class="colorable" cx="196" cy="168" r="10" fill="#ffffff"/>
+        <circle id="bus-scoop2" class="colorable" cx="204" cy="168" r="10" fill="#ffffff"/>
+        <g fill="none" stroke="#2a2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="90" y="100" width="220" height="22" rx="4"/>
+          <rect x="110" y="122" width="180" height="110"/>
+          <rect x="315" y="95" width="42" height="30" rx="4"/>
+          <line x1="330" y1="230" x2="330" y2="125"/>
+          <circle cx="175" cy="193" r="13"/>
+          <circle cx="225" cy="193" r="13"/>
+          <line x1="10" y1="10" x2="0" y2="40" stroke-width="2.5"/>
+          <line x1="40" y1="20" x2="30" y2="50" stroke-width="2.5"/>
+          <line x1="370" y1="15" x2="360" y2="45" stroke-width="2.5"/>
+        </g>
+      </svg>
+
+      <svg id="page-movienight" class="coloring-page" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <rect id="mov-roomL" class="colorable" x="0" y="0" width="188" height="300" fill="#ffffff"/>
+        <rect id="mov-roomR" class="colorable" x="212" y="0" width="188" height="300" fill="#ffffff"/>
+        <rect id="mov-screenL" class="colorable" x="34" y="120" width="120" height="70" rx="8" fill="#ffffff"/>
+        <rect id="mov-screenR" class="colorable" x="246" y="120" width="120" height="70" rx="8" fill="#ffffff"/>
+        <ellipse id="mov-personL" class="colorable" cx="94" cy="240" rx="46" ry="20" fill="#ffffff"/>
+        <ellipse id="mov-personR" class="colorable" cx="306" cy="240" rx="46" ry="20" fill="#ffffff"/>
+        <path id="mov-heart" class="colorable" d="M200 55 C212 40 236 50 226 68 C218 82 200 96 200 96 C200 96 182 82 174 68 C164 50 188 40 200 55 Z" fill="#ffffff"/>
+        <g fill="none" stroke="#2a2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <line x1="200" y1="0" x2="200" y2="300" stroke-dasharray="6 8" stroke-width="3"/>
+          <rect x="34" y="120" width="120" height="70" rx="8"/>
+          <rect x="246" y="120" width="120" height="70" rx="8"/>
+          <ellipse cx="94" cy="240" rx="46" ry="20"/>
+          <ellipse cx="306" cy="240" rx="46" ry="20"/>
+          <path d="M200 55 C212 40 236 50 226 68 C218 82 200 96 200 96 C200 96 182 82 174 68 C164 50 188 40 200 55 Z"/>
+        </g>
+      </svg>
+
+    </div>
+
+    <div class="booklet-nav">
+      <button type="button" class="booklet-arrow" id="bookletPrev">&#8249;</button>
+      <div class="booklet-dots" id="bookletDots">
+        <button type="button" class="booklet-dot active" data-index="0" aria-label="page 1"></button>
+        <button type="button" class="booklet-dot" data-index="1" aria-label="page 2"></button>
+        <button type="button" class="booklet-dot" data-index="2" aria-label="page 3"></button>
+        <button type="button" class="booklet-dot" data-index="3" aria-label="page 4"></button>
+      </div>
+      <button type="button" class="booklet-arrow" id="bookletNext">&#8250;</button>
+    </div>
+
+    <div class="booklet-footer">
+      <button type="button" class="booklet-reset" id="bookletReset">clear this page</button>
+      <div class="booklet-hint">tap outside to close</div>
+    </div>
+  </div>
+</div>
+
 <script>
   const stamp = document.querySelector('.stamp');
   const overlay = document.getElementById('bdayOverlay');
@@ -854,6 +1126,65 @@
         envelopeIntro.classList.add('hidden');
         document.body.style.overflow = '';
       }, 900);
+    });
+  }
+
+  const secretTrigger = document.querySelector('.signoff .name');
+  const bookletOverlay = document.getElementById('bookletOverlay');
+  if (secretTrigger && bookletOverlay) {
+    secretTrigger.addEventListener('click', () => {
+      bookletOverlay.classList.add('active');
+    });
+
+    bookletOverlay.addEventListener('click', (e) => {
+      if (e.target === bookletOverlay) {
+        bookletOverlay.classList.remove('active');
+      }
+    });
+
+    const pages = Array.from(bookletOverlay.querySelectorAll('.coloring-page'));
+    const dots = Array.from(bookletOverlay.querySelectorAll('.booklet-dot'));
+    let pageIndex = 0;
+
+    function showPage(i) {
+      pageIndex = (i + pages.length) % pages.length;
+      pages.forEach((p, idx) => p.classList.toggle('active', idx === pageIndex));
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === pageIndex));
+    }
+
+    document.getElementById('bookletPrev').addEventListener('click', () => showPage(pageIndex - 1));
+    document.getElementById('bookletNext').addEventListener('click', () => showPage(pageIndex + 1));
+    dots.forEach((d) => d.addEventListener('click', () => showPage(Number(d.getAttribute('data-index')))));
+
+    let selectedColor = '#e0693f';
+    const swatches = Array.from(document.getElementById('palette').querySelectorAll('.swatch'));
+    swatches.forEach((sw) => {
+      sw.addEventListener('click', () => {
+        selectedColor = sw.getAttribute('data-color');
+        swatches.forEach((s) => s.classList.remove('selected'));
+        sw.classList.add('selected');
+      });
+    });
+    swatches[0].classList.add('selected');
+
+    const STORAGE_PREFIX = 'farah-coloring-';
+    const colorables = Array.from(bookletOverlay.querySelectorAll('.colorable'));
+    colorables.forEach((shape) => {
+      try {
+        const saved = localStorage.getItem(STORAGE_PREFIX + shape.id);
+        if (saved) shape.setAttribute('fill', saved);
+      } catch (err) {}
+      shape.addEventListener('click', () => {
+        shape.setAttribute('fill', selectedColor);
+        try { localStorage.setItem(STORAGE_PREFIX + shape.id, selectedColor); } catch (err) {}
+      });
+    });
+
+    document.getElementById('bookletReset').addEventListener('click', () => {
+      pages[pageIndex].querySelectorAll('.colorable').forEach((shape) => {
+        shape.setAttribute('fill', '#ffffff');
+        try { localStorage.removeItem(STORAGE_PREFIX + shape.id); } catch (err) {}
+      });
     });
   }
 </script>
